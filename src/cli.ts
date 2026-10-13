@@ -28,7 +28,7 @@ async function main() {
     throw new Error("Argumentos inesperados. Usa --repo <ruta>.");
   if (values.help) {
     console.log(
-      "Terminal Review — Git de solo lectura · progreso local persistente\nUso: terminal-review [--repo <ruta>]\nAbrir visor desde un agente (macOS): --open [--repo <ruta>]\nChat: --text [--source unstaged|staged|untracked | --commit <hash>] [--file <n>] [--offset <n>] [--limit <1..200>]\nInstalar comandos de chat: --install-skills\nAtajos: ↑↓ Enter Tab Esc · h historial · w pendientes · r actualizar · / buscar\nm terminado/verde · n pendiente/naranja · c nota · f solo pendientes · ] siguiente archivo\nj/k bloques · s unificado/paralelo (≥80 columnas) · v imagen anterior/nueva\ne editor · t tareas · i resumen · E exportar Markdown · ? ayuda · q/Ctrl+C guardar y salir\nEditor: TERMINAL_REVIEW_EDITOR (code por defecto; argumentos {file}, {line}, {column})\nEstado: TERMINAL_REVIEW_STATE_DIR o ~/.local/state/terminal-review (fuera del repo).",
+      "Diffora — Git de solo lectura · progreso local persistente\nUso: diffora [--repo <ruta>]\nAbrir visor desde un agente (macOS): --open [--repo <ruta>]\nChat: --text [--source unstaged|staged|untracked | --commit <hash>] [--file <n>] [--offset <n>] [--limit <1..200>]\nInstalar comandos de chat: --install-skills\nAtajos: ↑↓ Enter Tab Esc · h historial · w pendientes · r actualizar · / buscar\nm terminado/verde · n pendiente/naranja · c nota · f solo pendientes · ] siguiente archivo\nj/k bloques · s unificado/paralelo (≥80 columnas) · v imagen anterior/nueva\ne editor · t tareas · i resumen · E exportar Markdown · ? ayuda · q/Ctrl+C guardar y salir\nEditor: DIFFORA_EDITOR (code por defecto; argumentos {file}, {line}, {column})\nEstado: DIFFORA_STATE_DIR o ~/.local/state/terminal-review (fuera del repo).",
     );
     return;
   }
@@ -50,7 +50,7 @@ async function main() {
       throw new Error("--install-skills se usa sin opciones de revisión.");
     console.log((await installSkills()).map(safeText).join("\n"));
     console.log(
-      "Reinicia el agente si no aparece la skill. Claude Code: /terminal-review · Codex: $terminal-review o /skills.",
+      "Reinicia el agente si no aparece la skill. Claude Code: /diffora · Codex: $diffora o /skills.",
     );
     return;
   }
@@ -120,7 +120,7 @@ async function main() {
     import("./ui/App.js"),
   ]);
   if (!process.stdin.isTTY || !process.stdout.isTTY)
-    throw new Error("Terminal Review requiere una terminal interactiva (TTY).");
+    throw new Error("Diffora requiere una terminal interactiva (TTY).");
   let flush = async () => {};
   const registerFlush = (save: () => Promise<void>) => { flush = save; };
   const instance = render(React.createElement(App, { repo, registerFlush }), {
@@ -140,7 +140,7 @@ async function main() {
 }
 main().catch((error: unknown) => {
   console.error(
-    `Terminal Review: ${safeText(error instanceof Error ? error.message : String(error))}`,
+    `Diffora: ${safeText(error instanceof Error ? error.message : String(error))}`,
   );
   process.exitCode = 1;
 });

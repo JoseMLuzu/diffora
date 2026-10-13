@@ -25,8 +25,8 @@ export async function createLaunchFile(
   node: string,
   cli: string,
 ): Promise<{ file: string; directory: string }> {
-  const directory = await mkdtemp(join(tmpdir(), "terminal-review-"));
-  const file = join(directory, "Terminal Review.command");
+  const directory = await mkdtemp(join(tmpdir(), "diffora-"));
+  const file = join(directory, "Diffora.command");
   const script = `#!/bin/sh\n${terminalCommand(repo, node, cli)}\nreview_exit_status=$?\n/bin/rm -- ${shellQuote(file)}\n/bin/rmdir -- ${shellQuote(directory)}\nexit "$review_exit_status"\n`;
   try {
     await writeFile(file, script, { mode: 0o700, flag: "wx" });
@@ -39,7 +39,7 @@ export async function createLaunchFile(
 export async function openTerminal(repo: string): Promise<void> {
   if (process.platform !== "darwin")
     throw new Error(
-      "--open requiere macOS y Terminal.app. En este sistema abre terminal-review directamente en una terminal interactiva.",
+      "--open requiere macOS y Terminal.app. En este sistema abre diffora directamente en una terminal interactiva.",
     );
   const cli = fileURLToPath(new URL("../cli.js", import.meta.url));
   try {
@@ -58,7 +58,7 @@ export async function openTerminal(repo: string): Promise<void> {
     await rm(launch.directory, { recursive: true, force: true });
     const detail = error instanceof Error ? error.message : String(error);
     throw new Error(
-      `No se pudo abrir Terminal.app desde este entorno. Ejecuta terminal-review directamente en una terminal local. ${detail}`,
+      `No se pudo abrir Terminal.app desde este entorno. Ejecuta diffora directamente en una terminal local. ${detail}`,
     );
   }
 }

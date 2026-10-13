@@ -23,7 +23,7 @@ export function commandArgs(command: string): string[] {
   }
   if (quote) throw new Error("Comillas sin cerrar en el editor.");
   if (started) args.push(token);
-  if (!args[0]) throw new Error("Configura TERMINAL_REVIEW_EDITOR.");
+  if (!args[0]) throw new Error("Configura DIFFORA_EDITOR.");
   return args;
 }
 export function editorInvocation(command: string, file: string, line: number, column: number) {
@@ -38,7 +38,7 @@ export function editorInvocation(command: string, file: string, line: number, co
   else throw new Error("Usa code/cursor o configura el editor con {file} y {line}; no se inicia un editor de terminal dentro de Ink.");
   return { program: program!, args };
 }
-export async function openEditor(root: string, location: EditorLocation, command = process.env.TERMINAL_REVIEW_EDITOR || "code"): Promise<void> {
+export async function openEditor(root: string, location: EditorLocation, command = process.env.DIFFORA_EDITOR || process.env.TERMINAL_REVIEW_EDITOR || "code"): Promise<void> {
   const full = resolve(root, location.path);
   const canonicalRoot = await realpath(root);
   const canonical = await realpath(full);
@@ -48,7 +48,7 @@ export async function openEditor(root: string, location: EditorLocation, command
   await new Promise<void>((resolveLaunch, reject) => {
     const child = spawn(invocation.program, invocation.args, { cwd: root, shell: false, stdio: "ignore", detached: true });
     child.once("error", (error: NodeJS.ErrnoException) => reject(new Error(
-      error.code === "ENOENT" ? `No se encontró ${invocation.program}; configura TERMINAL_REVIEW_EDITOR.` : error.message)));
+      error.code === "ENOENT" ? `No se encontró ${invocation.program}; configura DIFFORA_EDITOR.` : error.message)));
     child.once("spawn", () => { child.unref(); resolveLaunch(); });
   });
 }

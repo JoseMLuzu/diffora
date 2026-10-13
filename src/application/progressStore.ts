@@ -63,7 +63,7 @@ export class ProgressStore {
   private writable = true;
   private lastSaved = "";
   private diskVersion = "";
-  constructor(readonly root: string, directory = process.env.TERMINAL_REVIEW_STATE_DIR
+  constructor(readonly root: string, directory = process.env.DIFFORA_STATE_DIR ?? process.env.TERMINAL_REVIEW_STATE_DIR
     ?? join(process.env.XDG_STATE_HOME || join(homedir(), ".local", "state"), "terminal-review")) {
     this.directory = resolve(directory);
     this.repoId = createHash("sha256").update(root).digest("hex");

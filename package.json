@@ -1,10 +1,11 @@
 {
-  "name": "terminal-review",
+  "name": "diffora",
   "version": "0.1.0",
   "description": "Read-only local Git review in your terminal",
   "type": "module",
   "private": true,
   "bin": {
+    "diffora": "dist/cli.js",
     "terminal-review": "dist/cli.js"
   },
   "files": [

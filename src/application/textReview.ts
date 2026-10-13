@@ -57,7 +57,7 @@ export async function textReview(
   repo: Repository,
   options: TextOptions,
 ): Promise<string> {
-  const lines = [`Terminal Review · ${safeText(repo.root)}`];
+  const lines = [`Diffora · ${safeText(repo.root)}`];
   if (options.commit && options.source)
     throw new Error("Usa --commit o --source, no ambos.");
   if (!options.commit && !options.source && options.file === undefined) {

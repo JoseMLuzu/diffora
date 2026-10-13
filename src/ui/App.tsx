@@ -189,7 +189,7 @@ export function App({ repo, registerFlush }: { repo: Repository; registerFlush?:
     <Box flexDirection="column" width={size.width}>
       <Text bold>
         {fit(
-          `Terminal Review · ${state.mode === "history" ? "Historial" : "Pendientes"} · ${repo.root}`,
+          `Diffora · ${state.mode === "history" ? "Historial" : "Pendientes"} · ${repo.root}`,
           size.width,
         )}
       </Text>
