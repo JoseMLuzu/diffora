@@ -1,239 +1,162 @@
-# Terminal Review
+# Diffora
 
-Revisión local de cambios de Git después de trabajar con agentes de programación. Interfaz React + Ink, Git exclusivamente de lectura: no contiene acciones de staging, commits, checkout, push ni escrituras en el repositorio inspeccionado. Progreso, notas e informes se guardan fuera del repositorio; abrir un editor es una acción explícita del usuario.
+**Review what changed. Stay in your terminal.**
 
-## Instalación
+Diffora is a local Git review tool built with TypeScript, React and Ink. Browse commits, inspect pending changes, preview images, and keep track of what you have reviewed. Designed for the review step after working with a coding agent, it also works with changes you wrote yourself.
 
-Requisitos: Node.js **24 LTS recomendado** (mínimo 22.13), npm, Git en PATH y una terminal interactiva. Compatibilidad comprobada antes de instalar: [Ink 7](https://github.com/vadimdemedes/ink/releases/tag/v7.0.0) requiere Node ≥22 y React ≥19.2; el proyecto fija Ink 7.0.6 y React 19.2.4. [Calendario LTS de Node](https://github.com/nodejs/Release).
+Git access is read-only: Diffora does not stage, commit, check out or push. Notes and progress are stored outside the reviewed repository. No account, server or AI service is required.
 
-Desde esta carpeta:
+[Guía en español](docs/usage.es.md) · [Contributing](CONTRIBUTING.md) · [Issues](https://github.com/JoseMLuzu/diffora/issues) · [MIT license](LICENSE)
+
+## Features
+
+- Browse the latest 30 commits with hash, title and date; highlight commits absent from locally known upstream history with `↑`.
+- Review unstaged, staged and untracked files separately, including deletions and renames.
+- Switch between unified and side-by-side diffs, with line numbers, hunk navigation and highlighted changes.
+- Preview PNG, JPEG, WebP, GIF, TIFF and AVIF changes and toggle the previous/new image.
+- Search paths, filter unfinished files, and mark files as done or needing another review.
+- Persist notes and review progress; revisit outstanding tasks and export Markdown reports.
+- Open the current working-tree file at a diff line in VS Code, Cursor or a configured editor.
+- Navigate with the keyboard, use a single panel in narrow terminals, or drag panel borders in wide terminals.
+- Optionally launch from Claude Code or Codex; use plain text mode without a TTY.
+
+## Install from source
+
+Requirements: **Node.js 22.13+** (Node 24 recommended), npm, Git on PATH and an interactive terminal. Python 3 is needed only for PTY tests. Keep npm optional dependencies enabled: Sharp uses native optional packages.
 
 ```sh
-npm install
+git clone https://github.com/JoseMLuzu/diffora.git
+cd diffora
+npm ci
+npm run build
+npm install --global .
+```
+
+Run inside any Git repository:
+
+```sh
+cd /path/to/your-project
+diffora
+# Or select another repository, including paths with spaces:
+diffora --repo "/path/to/my project"
+```
+
+The package is not published to npm; `npm install -g diffora` is not the installation method for this project. Global installation needs a writable npm prefix. Without it, run `node /path/to/diffora/dist/cli.js --repo /path/to/project`.
+
+`terminal-review` remains a compatibility alias. Rebuild a linked source installation after updating it; reinstall globally if command mappings changed.
+
+## First review
+
+1. Press `h` for history or `w` for pending changes.
+2. Select a commit/category with ↑/↓ and press Enter.
+3. Select a file and press Enter to browse its diff.
+4. Press `m` when finished, or `n` if it needs another review. Use `c` to add a note.
+5. Press `f` to focus on unfinished files, or `t` to revisit tasks.
+6. Press `q` to save and exit; `?` shows keyboard help.
+
+Normal commits compare with their parent, the initial commit with the empty tree, and merges with their first parent. Pending categories compare working tree → index, index → HEAD, and untracked files shown as added content.
+
+Push labels use local upstream/remote-tracking refs. Diffora never fetches or checks GitHub live. Update refs yourself when needed, then press `r`.
+
+## Keyboard shortcuts
+
+| Key | Action |
+| --- | --- |
+| ↑ / ↓ | Select an item or scroll |
+| Enter | Open selection / next panel |
+| Tab / Shift+Tab | Next / previous panel |
+| Esc | Go back, clear a file filter, or cancel editing |
+| h / w / r | History / pending changes / refresh |
+| / | Search file paths; Enter applies, Ctrl+U clears input |
+| m / n | Toggle done (green) / needs review (orange) |
+| c | Edit a note; Enter saves, Esc cancels |
+| f / ] | Filter unfinished files / next unfinished file |
+| j / k | Next / previous diff hunk |
+| s | Unified / side-by-side text diff |
+| v | Previous / new image |
+| e | Open current file in the configured editor |
+| t / i | Outstanding tasks / review summary |
+| E | Export a Markdown report |
+| ? | Help |
+| q / Ctrl+C | Save and exit; Ctrl+C can exit after a save failure |
+
+Below 110 columns, one panel is displayed at a time. Side-by-side diffs require 80 columns. Drag vertical borders to resize panels in wide terminals with SGR mouse reporting. The original screen and terminal settings are restored on exit.
+
+## Coding-agent integration
+
+```sh
+diffora --install-skills
+```
+
+Restart your agent if necessary. Invoke **`$diffora` in Codex** or **`/diffora` in Claude Code**. Skills are installed under `~/.agents/skills/` and `~/.claude/skills/`; customized instructions are preserved.
+
+The default action, `diffora --open`, opens a separate Terminal.app window on **macOS**. It does not embed the viewer in chat or take over the agent's keyboard. A sandbox may block application launch; run the CLI yourself in that case. The regular CLI and text mode do not require macOS; PTY tests target macOS/Linux.
+
+For explicit text review inside a conversation or script:
+
+```sh
+diffora --text
+diffora --text --source staged --file 1
+diffora --text --commit abc1234 --file 1 --offset 80 --limit 80
+```
+
+Files are numbered from 1, offsets from 0. Commit-prefix selection in text mode is limited to the latest 30 commits. `--help` lists all options.
+
+## Progress and configuration
+
+Marks, notes and preferences persist per repository. Pending reviews are checked against content fingerprints when reopening, refreshing and during periodic checks. Changed content loses its mark; its note remains as stale. Commit reviews are tied to their hash.
+
+| Variable | Purpose |
+| --- | --- |
+| `DIFFORA_STATE_DIR` | Progress/export directory, outside the reviewed repository |
+| `XDG_STATE_HOME` | Default state base; otherwise `~/.local/state` |
+| `DIFFORA_EDITOR` | Editor command, default `code`; supports `{file}`, `{line}`, `{column}` |
+
+For compatibility, the state subdirectory is still `terminal-review`. Legacy `TERMINAL_REVIEW_STATE_DIR` and `TERMINAL_REVIEW_EDITOR` variables remain supported.
+
+```sh
+DIFFORA_EDITOR="cursor --reuse-window" diffora
+```
+
+The editor opens the **current working-tree file**, even when reviewing historical changes; line numbers may not match it. Notes/reports contain local review information. See the [Spanish guide](docs/usage.es.md) for persistence failures, concurrent viewers and detailed workflows.
+
+## Development
+
+```sh
+npm ci
+npm run dev -- --repo /path/to/test-repo
 npm run typecheck
 npm test
 npm run build
-node dist/cli.js --repo "/ruta/a/mi repositorio"
+npm run test:terminal
+npm run test:workflow
 ```
 
-Para disponer del comando `terminal-review` desde cualquier carpeta, instala este proyecto globalmente una sola vez, sin publicarlo:
+Integration tests use temporary repositories. Coverage includes parsing, initial/merge commits, staged/unstaged/untracked files, deleted and renamed paths, binaries, images, push status, race protection and persistence. Python PTY tests exercise navigation, mouse resizing, screen restoration and review workflows at 40, 80 and 140 columns.
 
-```sh
-npm install --global /Users/josemanuel/Developer/experiments/terminal-review
-cd /Users/josemanuel/Developer/experiments/social-rooms
-terminal-review
-```
+| Location | Responsibility |
+| --- | --- |
+| `src/cli.ts` | Arguments and process lifecycle |
+| `src/ui/` | Ink components, input and terminal layout |
+| `src/application/` | Reducer, coordination, progress, reports and launchers |
+| `src/core/` | Models, diff and progress parsing |
+| `src/git/` | Git execution, queries and fingerprints |
+| `src/images/` | Bounded decoding and terminal rasterization |
 
-El comando usa el repositorio de la carpeta actual; no lleva `/` al principio. La instalación local enlaza el proyecto compilado. Si cambias las fuentes, ejecuta `npm run build` desde la carpeta del proyecto. El script `prepare` también compila al instalar con scripts habilitados; npm 11 puede requerir `--allow-scripts=terminal-review` para habilitarlo en instalaciones globales.
+The UI never runs Git directly. Git is spawned with separate arguments and `shell: false`; pagers, external diff tools and textconv are disabled. Paths use NUL delimiters, controls are neutralized, and stale asynchronous results are rejected.
 
-Si prefieres instalar una copia empaquetada:
+## Current limitations
 
-```sh
-npm pack
-npm install --global ./terminal-review-0.1.0.tgz
-terminal-review --repo "/ruta/a/mi repositorio"
-```
+- Text diffs: 1 MiB / 10,000 lines, with a truncation warning. List queries: 8 MiB. Git processes: 15 seconds.
+- Image versions: 10 MiB / 16 megapixels; thumbnails up to 160×160 pixels. Animation shows its first frame. SVG is text; other binaries show a notice.
+- Pending fingerprints: 64 MiB and 10 seconds per read. Files that cannot be validated cannot be marked reviewed.
+- No horizontal scrolling or content search. Long lines are clipped; UTF-8 filenames/content are expected.
+- Combined conflict hunks are not parsed as ordinary diffs. Submodules show reference changes rather than nested history.
+- Local remote refs may be stale. Periodic reads are not an atomic snapshot of concurrent edits.
+- Progress is local, without cross-machine sync. Notes are per file/source. Review marks are human decisions, not guarantees of correctness.
 
-La instalación global requiere permisos en el prefijo de npm. También puedes usar directamente `node /ruta/a/terminal-review/dist/cli.js`.
+## Contributing and license
 
-## Uso
+Bug reports, focused improvements and documentation contributions are welcome. Read [CONTRIBUTING.md](CONTRIBUTING.md) for the workflow and checks.
 
-```sh
-terminal-review                     # repositorio del directorio actual
-terminal-review --repo /ruta/repo   # acepta subcarpetas y rutas con espacios
-terminal-review --help
-terminal-review --version
-npm run dev -- --repo /ruta/repo    # desarrollo con tsx
-```
-
-Selecciona un commit con las flechas y pulsa Enter para abrir sus archivos; selecciona un archivo y pulsa Enter para entrar en el visor. Los archivos y diferencias se cargan al cambiar la selección. Tab permite pasar entre paneles. Pulsa `w` para revisar cambios pendientes y `h` para regresar al historial.
-
-El historial muestra hasta 30 commits alcanzables desde HEAD, con hash corto, título y fecha de commit. Un commit normal se compara con su padre; el primer commit usa el árbol vacío mediante `diff-tree --root`; un merge se compara con el **primer padre**, indicado en pantalla.
-
-Las categorías pendientes son:
-
-- **Sin preparar:** working tree frente al índice.
-- **Preparados:** índice frente a HEAD (también funciona antes del primer commit).
-- **Sin seguimiento:** archivos nuevos no ignorados, representados como contenido añadido.
-
-Se muestran estados Git (`A`, `M`, `D`, `R…`, `?`) y origen/destino de renombres. Las imágenes compatibles muestran una vista previa a color; los demás binarios presentan un aviso. Los cambios de permisos y renombres sin cambios de contenido muestran los metadatos del patch.
-
-| Tecla           | Acción                                                 |
-| --------------- | ------------------------------------------------------ |
-| ↑ / ↓           | Seleccionar en listas o desplazar una línea en el diff |
-| Enter           | Abrir selección / pasar al siguiente panel             |
-| Tab / Shift+Tab | Siguiente / anterior panel (cíclico)                   |
-| Esc             | Volver al panel anterior                               |
-| h / w           | Historial / pendientes                                 |
-| r               | Actualizar las consultas                               |
-| /               | Buscar archivos por nombre o ruta                      |
-| m               | Marcar / desmarcar el archivo seleccionado como revisado |
-| n               | Marcar / desmarcar como pendiente de otra revisión (naranja) |
-| s               | Alternar diff unificado / paralelo (en el visor de texto) |
-| c               | Escribir o editar una nota; Enter guarda, Esc cancela   |
-| f               | Alternar «solo lo que falta» (gris y naranja)           |
-| ]               | Siguiente archivo no terminado del filtro, con vuelta al inicio |
-| j / k           | Siguiente / anterior bloque de cambios                 |
-| e               | Abrir el archivo actual y la línea del diff en el editor |
-| t               | Todas las tareas del repositorio; Enter abre la seleccionada |
-| i               | Resumen del commit o categoría actual                  |
-| E               | Exportar un informe Markdown (mayúscula)               |
-| ?               | Ayuda de teclado                                       |
-| q / Ctrl+C      | Salir y restaurar la terminal                          |
-
-Con menos de 110 columnas se muestra únicamente el panel activo. Las líneas largas se recortan con `…` según el ancho de terminal, incluyendo caracteres anchos. La vista unificada inicial tiene números anteriores/nuevos, añadidos verdes `+`, eliminados rojos `-`, contexto neutro y encabezados de bloques. La barra inferior muestra atajos, carga, errores, selección y posición del diff.
-
-### Comparación lado a lado
-
-Entra al diff de texto con **Enter** y pulsa **s**: la versión **Anterior** queda a la izquierda y la **Nueva** a la derecha, con fondos rojos/verdes y énfasis en la parte modificada de cada pareja de líneas. Las líneas de contexto aparecen en ambos lados; una adición o eliminación sin pareja deja el otro lado vacío. Se conservan los números reales y los metadatos de Git. Los bloques de eliminaciones/adiciones se emparejan por orden dentro del mismo hunk; no se pretende detectar movimientos de código.
-
-Al enfocar el visor paralelo, ocupa todo el ancho disponible. **Esc** o **Tab** recuperan los paneles de archivos e historial; **s** vuelve a la vista unificada. El cambio de vista conserva el bloque que estabas leyendo y no borra las marcas verdes/naranjas ni vuelve a consultar Git.
-
-La vista paralela requiere al menos **80 columnas**. Si reduces la ventana, aparece un aviso y se muestra temporalmente la vista unificada; al ensancharla se recupera la paralela. La preferencia dura durante la sesión, también al cambiar de archivo. Las líneas largas se recortan por columna sin desplazamiento horizontal. Las imágenes mantienen su control **v** anterior/nueva; **s** no las cambia.
-
-### Buscar y llevar el progreso de revisión
-
-Pulsa `/` desde cualquier panel: se abre el panel de archivos con un campo de búsqueda. El filtro se aplica mientras escribes, sin distinguir mayúsculas/minúsculas, sobre la ruta completa y la ruta anterior de los renombres. Es una búsqueda literal, limitada a los archivos de la categoría o commit seleccionado. **Enter** aplica el filtro y permite recorrer los resultados con las flechas; otro Enter abre el diff. **Esc** limpia el filtro; **Ctrl+U** borra el texto mientras lo editas. Durante la edición, letras como `q`, `h` o `r` forman parte de la búsqueda; Ctrl+C sigue permitiendo salir. No hay búsqueda dentro del contenido del diff.
-
-Con el diff cargado, pulsa `m` en el panel de archivos o en el visor para alternar el **punto verde ●** (revisado y terminado). Pulsa `n` para alternar el **punto naranja ●** (revisado parcialmente o necesita otra revisión). Ambas marcas son excluyentes: `m` pasa de naranja a verde, `n` de verde a naranja, y repetir la tecla de la marca actual vuelve al punto gris `·` sin revisar. Los puntos conservan su color incluso en la fila seleccionada; `M`, `A`, `D` y los demás estados de Git siguen visibles. El encabezado muestra `terminados/total ✓` y añade `pendientes !` si hay naranjas; el diff usa **✓** para verde y **!** para naranja, también distinguibles sin color.
-
-Si **un solo archivo está naranja**, el commit queda naranja aunque los demás sean verdes o sigan sin revisar. Solo queda verde cuando **todos** sus archivos están terminados; si no hay naranjas pero quedan archivos sin revisar, sigue gris. El resumen siempre incluye la lista completa, no solo los resultados del filtro. Los commits sin lista cargada o restaurada, o sin archivos, no se marcan automáticamente. Las marcas se identifican por commit/categoría y ruta, incluyendo los renombres; sobreviven a la navegación y al cierre del visor. No modifican Git ni se guardan en el repositorio.
-
-### Progreso persistente y cambios externos
-
-Las marcas, notas, resúmenes de commits y preferencia de vista se guardan automáticamente en **~/.local/state/terminal-review/**. Si existe `XDG_STATE_HOME`, se usa su subcarpeta `terminal-review`; `TERMINAL_REVIEW_STATE_DIR` permite elegir otra carpeta, siempre fuera del repositorio. Cada repositorio tiene un JSON independiente, identificado por la ruta raíz canónica. Los directorios nuevos son privados (0700) y los archivos usan 0600. El guardado usa un temporal y un reemplazo atómico; **q** y Ctrl+C esperan el último guardado.
-
-Al iniciar, actualizar con **r** y aproximadamente **cada 2 segundos**, se comprueban los cambios pendientes marcados o anotados y el diff seleccionado. Se compara una huella del contenido completo, modos, versión del índice y baseline de Git, no una miniatura ni el patch truncado. Cambiar solo la fecha de modificación no invalida una revisión. Si cambia el contenido, desaparece el cambio o pasa a otra categoría, pierde su marca y vuelve a **sin revisar**. Su nota se conserva como **obsoleta: volver a revisar**. Las marcas de commits son estables porque su identidad incluye el hash.
-
-`r` conserva las marcas que siguen correspondiendo al mismo contenido. La búsqueda se limpia al cambiar de categoría/commit o actualizar. La comprobación periódica no constituye una instantánea atómica con otros procesos; también se compara la huella antes y después de cargar cada diff.
-
-Si el estado está corrupto, tiene otra versión, es excesivo o no se puede leer, la interfaz continúa funcionando y avisa; **no se sobrescribe el archivo original**. Si falla un guardado, `q` muestra el error en lugar de perder datos silenciosamente; Ctrl+C permite salir sin guardar. Si dos ventanas escriben sobre el mismo progreso, la segunda detecta el cambio externo y no lo pisa: exporta sus notas con **E** antes de reabrir. Un bloqueo temporal `.write-lock` dejado por una terminación forzada solo debe retirarse cuando hayas confirmado que ningún visor está guardando.
-
-### Notas y tareas
-
-Con el diff cargado, pulsa **c**, escribe una nota de hasta **1000 caracteres** y pulsa Enter. Guardar una nota no vacía marca el archivo naranja. **Esc** cancela; **Ctrl+U** borra el borrador. Durante la edición, los atajos son texto normal. Guardar una nota vacía elimina esa nota, no la marca.
-
-**t** reúne las marcas naranjas y las notas sin resolver, incluso si pertenecen a otro commit/categoría. Las notas cuyo contenido cambió se distinguen como obsoletas; no se pierden al invalidar su marca. Usa ↑↓ y Enter para abrir su fuente y archivo; se limpian los filtros para que el archivo no quede oculto. Si el commit está fuera de los últimos 30, se carga por su hash y se añade al historial. Una tarea cuyo cambio ya desapareció sigue visible con su nota, aunque ya no haya diff que abrir.
-
-**m** resuelve la tarea y archiva su nota; el texto se conserva y reaparece al volver a marcar naranja. Al desmarcar una nota sin resolver, sigue disponible entre las tareas. Los borradores cancelados o sin guardar no se persisten.
-
-### Revisar lo que falta y navegar por bloques
-
-**f** oculta los archivos verdes, sin cambiar índices ni identidades de Git. Se combina con la búsqueda por ruta. **]** salta al siguiente archivo gris/naranja que coincida, volviendo al primero al llegar al final. Marcar verde un archivo con este filtro activo selecciona el siguiente pendiente; si no queda ninguno, muestra una lista vacía.
-
-En el diff de texto, **j/k** saltan entre encabezados de bloques, tanto en vista unificada como paralela. No marcan bloques individuales. La línea que se abre en el editor corresponde a la primera línea nueva visible, o a la primera línea del bloque seleccionado; cerca del final puede quedar contexto anterior en pantalla para no dejar el visor vacío.
-
-### Abrir en el editor
-
-**e** envía el archivo y su línea a **VS Code (`code --goto`)** por defecto. También reconoce `cursor`. No usa un shell ni toma el teclado con Vim/Nano. Configura el comando antes de abrir el visor:
-
-```sh
-TERMINAL_REVIEW_EDITOR="code --reuse-window" terminal-review
-TERMINAL_REVIEW_EDITOR="cursor --reuse-window" terminal-review
-TERMINAL_REVIEW_EDITOR='mi-editor --file "{file}" --line {line}' terminal-review
-```
-
-Los argumentos citados se respetan; las plantillas admiten `{file}`, `{line}` y `{column}`. Se comprueba que el archivo regular exista dentro del repositorio, incluyendo el destino de symlinks. Un archivo eliminado no se abre. **Se abre el archivo actual del working tree**, no una copia histórica: si estás revisando un commit o el índice y el archivo actual difiere, el número viene del diff y puede no coincidir con el contenido actual. Una línea eliminada usa la siguiente línea nueva disponible, o su número anterior como aproximación.
-
-### Resumen e informe Markdown
-
-**i** muestra total de archivos, terminados, pendientes y sin revisar del commit/categoría actual, más el número de tareas abiertas del repositorio. Siempre cuenta la lista completa, independientemente de filtros.
-
-**E** exporta un informe nuevo en **~/.local/state/terminal-review/exports/<id-repo>/** (o en la carpeta configurada) y muestra su ruta. Incluye ámbito, fecha, todos sus archivos/estados/notas y todas las tareas abiertas del repositorio. No sobrescribe informes anteriores ni escribe Markdown en tu proyecto. Las marcas son decisiones humanas: el informe no asegura que el código esté libre de errores. Esc vuelve al visor; **?** muestra todos los atajos.
-
-## Vista previa de imágenes
-
-Selecciona una imagen como cualquier otro archivo. El panel de diferencias muestra una miniatura a color y su formato, resolución y tamaño. Pulsa **v** en ese panel para alternar **Anterior / Nueva**. En archivos añadidos o eliminados se muestra la versión disponible; puedes alternar para consultar el aviso de la versión ausente.
-
-Se admiten **PNG, JPEG, WebP, GIF, TIFF y AVIF** (comprobados por extensión y firma del contenido), tanto en commits como en el índice y el working tree. Los renombres conservan la imagen de origen. GIF y otros formatos animados muestran solamente el primer fotograma; no se reproduce animación. SVG sigue mostrando su diff como texto.
-
-La miniatura usa bloques Unicode `▀` con colores ANSI de primer plano y fondo, conservando proporciones y adaptándose al panel. La transparencia aparece sobre un fondo cuadriculado. Es una vista previa de resolución limitada, sin protocolos gráficos específicos de un emulador; en terminales sin true color los colores pueden aproximarse. No es una imagen a resolución completa ni un diff de píxeles superpuesto.
-
-Cada versión tiene un límite de **10 MiB y 16 megapíxeles**, con miniaturas de hasta 160×160 píxeles y 5 segundos de procesamiento de la miniatura. Las imágenes dañadas, excesivas o no compatibles presentan un aviso. No se ejecuta código ni se procesa SVG/PDF mediante el decodificador de imágenes. La aplicación continúa siendo de solo lectura.
-
-La decodificación usa Sharp 0.35.4, que requiere Node ≥20.9, compatible con el requisito del proyecto. npm instala sus dependencias nativas opcionales para tu plataforma: no uses `--omit=optional`. [Instalación y compatibilidad de Sharp](https://sharp.pixelplumbing.com/install/).
-
-## Abrir el visor desde Claude Code o Codex
-
-Actualiza o instala las skills personales una vez desde tu terminal:
-
-```sh
-terminal-review --install-skills
-```
-
-Esto crea `~/.claude/skills/terminal-review/SKILL.md` y `~/.agents/skills/terminal-review/SKILL.md`. Actualiza la versión oficial anterior que navegaba por texto y conserva una copia `SKILL.md.backup-<hash>`. Si el contenido está personalizado, lo conserva sin sobrescribir. No modifica el repositorio revisado. Reinicia el agente si conserva la versión anterior.
-
-- **Claude Code:** escribe `/terminal-review` en el chat.
-- **Codex CLI/IDE:** escribe `$terminal-review` o selecciónalo desde `/skills`. En la app, usa el selector de skills disponible (`@` en ChatGPT).
-
-La skill ejecuta `terminal-review --open` en el repositorio del chat. En **macOS** abre una ventana independiente de Terminal.app con la interfaz Ink: paneles, flechas, Enter, Tab, historial y pendientes. El agente mantiene su conversación abierta. `q` sale del visor; después puedes volver a la ventana del chat.
-
-No se toma el teclado del terminal en el que sigue ejecutándose el agente: abrir una UI a través de su herramienta de shell no transfiere automáticamente la entrada de usuario. El modo `--open` usa un archivo `.command` temporal ejecutable con argumentos citados literalmente y una ruta absoluta a Node; no necesita AppleScript ni permisos de Automatización. El archivo y su carpeta se eliminan al salir del visor. Si la apertura falla, se elimina el archivo y se muestra el error. Un sandbox que bloquee abrir aplicaciones puede impedir el lanzamiento desde el agente; en ese caso, ejecútalo desde tu terminal local.
-
-Puedes probarlo directamente:
-
-```sh
-terminal-review --open --repo /Users/josemanuel/Developer/experiments/social-rooms
-```
-
-`--open` requiere macOS y una sesión gráfica local. La UI normal `terminal-review` y el modo de texto no tienen ese requisito. La apertura automática debe comprobarse en el entorno del usuario; el entorno del agente bloqueó Launch Services al intentar abrir Terminal.app.
-
-La invocación depende del cliente: no se registra `/terminal-review` como comando nativo de Codex ni se reemplaza su `/review`. [Invocación de skills en OpenAI Docs](https://learn.chatgpt.com/docs/build-skills), [skills en Claude Code](https://code.claude.com/docs/en/skills).
-
-### Modo de texto opcional
-
-Si prefieres revisar dentro de la conversación, pídelo expresamente al invocar la skill. La navegación por texto sigue disponible sin TTY:
-
-```sh
-terminal-review --text
-terminal-review --text --source staged
-terminal-review --text --source unstaged --file 2
-terminal-review --text --commit e69f764 --file 1
-terminal-review --text --source unstaged --file 2 --offset 80 --limit 80
-```
-
-Los números de archivo comienzan en 1 y corresponden a la última lista de su categoría/commit. `--offset` comienza en 0; `--limit` admite de 1 a 200 filas (80 por defecto). Las diferencias indican la siguiente página y conservan los avisos de binarios y truncamiento. El informe tiene un límite adicional de 65 536 caracteres. La selección de commits por hash se limita a los últimos 30 commits y rechaza prefijos ambiguos.
-
-Si el comando no está instalado globalmente, puedes instalar las skills con `node /Users/josemanuel/Developer/experiments/terminal-review/dist/cli.js --install-skills`, pero el agente necesitará el comando en su PATH o una ruta absoluta conocida al CLI.
-
-## Arquitectura
-
-```text
-src/cli.ts                Argumentos, validación de TTY y ciclo de vida
-src/ui/                   Componentes Ink, dimensiones y recorte visual
-src/application/          useReducer, coordinación, informes de texto e instalación de skills
-src/core/                 Modelos, parser y neutralización de controles
-src/git/                  Procesos Git y consultas del repositorio
-src/images/               Decodificación acotada y miniaturas a color
-```
-
-La UI no ejecuta Git: consume `useReview`, que coordina `Repository`. Cada consulta lleva una identidad de selección y generación; el reducer descarta resultados y errores atrasados, incluso al salir de una selección y volver a ella. Los efectos se cancelan con AbortController al cambiar selección o desmontar la aplicación.
-
-Git se ejecuta mediante `spawn`, `shell: false`, argumentos separados, pathspecs literales y nombres delimitados por NUL. Se desactivan paginadores, color de Git, herramientas externas de diff y textconv. `GIT_OPTIONAL_LOCKS=0` evita actualizaciones opcionales del índice. Los controles de los archivos, títulos, rutas y errores se sustituyen por representaciones visibles antes de renderizarlos; los tabs se convierten en cuatro espacios. Los enlaces simbólicos nuevos se muestran como su destino, sin leer el archivo enlazado.
-
-## Desarrollo y validación
-
-| Script                         | Propósito                                                 |
-| ------------------------------ | --------------------------------------------------------- |
-| `npm run dev -- --repo <ruta>` | Ejecutar fuentes con tsx                                  |
-| `npm run build`                | Compilar `src/` a `dist/` con declaraciones               |
-| `npm run typecheck`            | Comprobar código y pruebas con TypeScript estricto        |
-| `npm test`                     | Parser, reducer e integración con repositorios temporales |
-| `npm run test:terminal`        | Prueba real en PTY, macOS/Linux y Python 3                |
-| `npm run test:workflow`        | Notas, editor simulado, filtros, exportación y reapertura |
-
-Las pruebas crean y modifican **solamente repositorios temporales**: primer commit, commit normal, merge, historial vacío, últimos 30 commits, estados preparados/sin preparar, archivos nuevos, eliminados, renombrados, binarios, nombres con espacios/saltos de línea/pathspecs, límites y ausencia de Git. También comparan el estado Git y el índice antes/después de las lecturas y verifican el rechazo de respuestas atrasadas.
-
-La prueba PTY comprueba navegación a pendientes, archivos y diff, búsqueda con edición y ausencia de resultados, marcado/desmarcado, comparación paralela, redimensionado y recuperación de la vista, flechas, Tab, Esc, vuelta al historial, actualización y salida con `q` y Ctrl+C; verifica la restauración de los ajustes de terminal en 140, 80 y 40 columnas. No modifica el repositorio desde el cual se ejecuta.
-
-**Estado de validación:** comprobación de tipos completa, compilación y 79 pruebas de parser, reducer, interfaz, persistencia, seguridad e integración aprobadas. Las pruebas PTY cubren 140, 80 y 40 columnas: seis sesiones de navegación/colores/imágenes y nueve sesiones del flujo de revisión con reinicios, notas, editor simulado con archivo/línea verificados, filtros, bloques, exportación e invalidación automática sin pulsar r. Las fixtures, el editor simulado y el estado son temporales; no modifican el repositorio real.
-
-## Límites del MVP
-
-- Diff y contenido nuevo: máximo **1 MiB**, y máximo **10 000 líneas de contenido**; se avisa si se trunca. Consultas de listas: máximo **8 MiB**, con error en lugar de presentar resultados parciales. Git tiene un límite de **15 segundos** por proceso.
-- Archivos de texto interpretados como UTF-8. Los nuevos se consideran binarios si contienen NUL en sus primeros 8 000 bytes, como la heurística básica de Git. Nombres con bytes que no sean UTF-8 se muestran con caracteres de reemplazo.
-- Sin desplazamiento horizontal; para ver más contenido, ensancha la terminal. Se recomienda al menos 40 columnas y 8 filas.
-- Comprobación periódica cada 2 s sin observar cada evento del sistema de archivos; `r` fuerza la actualización. Las consultas no constituyen una instantánea atómica si otro proceso modifica el repositorio mientras se revisa.
-- Submódulos muestran los cambios de referencia; no se abre su historial interno. Los conflictos sin resolver usan la salida de diff de Git; el parser no implementa bloques combinados `@@@` como un diff ordinario.
-- Huellas de archivos regulares pendientes: máximo **64 MiB** y 10 s por lectura; archivos no validables se muestran, pero no se marcan. El estado/informe tiene un límite de **2 MiB** y las notas de 1000 caracteres. El progreso es local, no se sincroniza ni se comparte automáticamente entre equipos.
-- Sin búsqueda de contenido, revisión de bloques individuales, IA, servidor ni integración remota con GitHub. Las notas son por archivo y fuente.
+Diffora is available under the [MIT license](LICENSE).
