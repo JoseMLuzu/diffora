@@ -28,6 +28,8 @@ diffora
 
 Already in another directory? Run `diffora --repo "/path/to/your project"`. The older `terminal-review` command remains an alias.
 
+**Local vs. global install:** `npm i diffora` installs into the current project's `node_modules`; run it there with `npx diffora`. Use `npm install --global diffora` if you want the bare `diffora` command from any directory. Check the CLI with `diffora --version` (or `npx diffora --version` for a local install).
+
 > **First run:** press `w` for pending changes or `h` for commits. Use ↑/↓ and Enter to move from a category or commit to its files, then to a diff. Press `?` for help and `q` to save and exit.
 
 ### What you can review
@@ -87,6 +89,8 @@ Install the chat skills once:
 ```sh
 diffora --install-skills
 ```
+
+The skills call `diffora` directly, so install it globally first.
 
 Then use **`$diffora` in Codex** or **`/diffora` in Claude Code**. Restart the agent if the new skill does not appear. On macOS, the skill runs `diffora --open` to open the interactive viewer in a **separate Terminal.app window**; return to the chat after pressing `q`. The viewer does not appear inside the chat.
 

@@ -11,6 +11,8 @@ npm install --global diffora
 diffora
 ```
 
+`npm i diffora` (sin `--global`) lo instala solo en la carpeta actual. En ese caso, entra al repositorio que quieres revisar y ejecuta `npx diffora`, o pasa su ruta con `npx diffora --repo /ruta/al/repositorio`. Para disponer de `diffora` directamente desde cualquier carpeta, usa la instalación global. Comprueba la versión con `diffora --version` o `npx diffora --version`.
+
 Si prefieres trabajar desde el código fuente, sigue la instalación que se explica a continuación.
 
 ## Instalación
@@ -177,6 +179,8 @@ Actualiza o instala las skills personales una vez desde tu terminal:
 ```sh
 diffora --install-skills
 ```
+
+Las skills invocan `diffora` directamente; instala el paquete de forma global antes de usarlas.
 
 Esto crea las skills `diffora` en `~/.claude/skills/` y `~/.agents/skills/`, y conserva la skill `terminal-review` como alias compatible. Actualiza la versión oficial anterior que navegaba por texto y conserva una copia `SKILL.md.backup-<hash>`. Si el contenido está personalizado, lo conserva sin sobrescribir. No modifica el repositorio revisado. Reinicia el agente si conserva la versión anterior.
 
