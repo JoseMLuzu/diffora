@@ -11,7 +11,9 @@
   "files": [
     "dist",
     "README.md",
-    "integrations"
+    "integrations",
+    "docs",
+    "CONTRIBUTING.md"
   ],
   "engines": {
     "node": ">=22.13.0"
@@ -36,5 +38,23 @@
     "@types/react": "^19.2.0",
     "tsx": "4.21.0",
     "typescript": "5.9.3"
-  }
+  },
+  "license": "MIT",
+  "author": "JoseMLuzu",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JoseMLuzu/diffora.git"
+  },
+  "homepage": "https://github.com/JoseMLuzu/diffora#readme",
+  "bugs": {
+    "url": "https://github.com/JoseMLuzu/diffora/issues"
+  },
+  "keywords": [
+    "git",
+    "diff",
+    "review",
+    "terminal",
+    "tui",
+    "ink"
+  ]
 }
