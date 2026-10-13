@@ -74,7 +74,8 @@ export class Repository {
       "--format=%H%x00%h%x00%s%x00%cs%x00%P", hash, "--"], MAX_QUERY_BYTES, false, signal);
     const fields = text.trimEnd().split("\0");
     if (fields.length !== 5) throw new Error("Commit no disponible.");
-    return { hash: fields[0]!, shortHash: fields[1]!, title: fields[2]!, date: fields[3]!, parents: fields[4]!.split(" ").filter(Boolean) };
+    const commits = await this.withPushStatus([{ hash: fields[0]!, shortHash: fields[1]!, title: fields[2]!, date: fields[3]!, parents: fields[4]!.split(" ").filter(Boolean) }], signal);
+    return commits[0]!;
   }
   async commits(signal?: AbortSignal): Promise<Commit[]> {
     if (!(await this.hasHead(signal))) return [];
@@ -104,7 +105,25 @@ export class Repository {
           parents: fields[i + 4]!.split(" ").filter(Boolean),
         });
     }
-    return commits;
+    return this.withPushStatus(commits, signal);
+  }
+  private async withPushStatus(commits: Commit[], signal?: AbortSignal): Promise<Commit[]> {
+    if (!commits.length) return commits;
+    let upstream: string | undefined;
+    try {
+      upstream = (await runGit(this.root, ["rev-parse", "--verify", "--quiet", "@{upstream}"],
+        MAX_QUERY_BYTES, false, signal)).text.trim();
+    } catch (error) {
+      if (!(error instanceof GitError && error.code === 1)) throw error;
+    }
+    // Compare with the configured upstream, or all remote-tracking refs when
+    // the branch has none. Without remote refs, every local commit is unpushed.
+    // Anchor to the loaded commit: HEAD may change while the viewer is querying.
+    // Excluding published ancestry only removes entries from this same history.
+    const result = await runGit(this.root, ["rev-list", `--max-count=${commits.length}`, commits[0]!.hash, "--not",
+      ...(upstream ? [upstream] : ["--remotes"]), "--"], MAX_QUERY_BYTES, false, signal);
+    const unpushed = new Set(result.text.trim().split("\n"));
+    return commits.map((commit) => ({ ...commit, pushStatus: unpushed.has(commit.hash) ? "unpushed" : "pushed" }));
   }
   async files(source: Source, signal?: AbortSignal): Promise<ChangedFile[]> {
     if (source.kind === "untracked") {

@@ -4,6 +4,7 @@ export interface Commit {
   title: string;
   date: string;
   parents: string[];
+  pushStatus?: "unpushed" | "pushed";
 }
 export interface ChangedFile {
   path: string;

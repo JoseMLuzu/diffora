@@ -175,7 +175,13 @@ export function App({ repo, registerFlush }: { repo: Repository; registerFlush?:
   const fileStatus = file ? fileReviewStatus(state, file) : "unreviewed";
   const leftItems =
     state.mode === "history"
-      ? state.commits.map((c) => ({ label: `${c.shortHash} ${c.date} ${c.title}`, reviewStatus: commitReviewStatus(state, c) }))
+      ? state.commits.map((c, index) => ({
+          label: `${c.pushStatus === "unpushed" ? "↑ " : ""}${c.shortHash} ${c.date} ${c.title}`,
+          reviewStatus: commitReviewStatus(state, c),
+          highlighted: c.pushStatus === "unpushed",
+          ...(index > 0 && c.pushStatus && state.commits[index - 1]?.pushStatus && c.pushStatus !== state.commits[index - 1]?.pushStatus
+            ? { separatorBefore: c.pushStatus === "pushed" ? "Publicados" : "Sin push" } : {}),
+        }))
       : categories.map((c) => ({ label: `${labels[c]} (${state.pending[c].length})` }));
   const sourceTitle =
     source?.kind === "commit"

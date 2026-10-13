@@ -5,7 +5,22 @@ import { renderToString } from "ink";
 import { stripVTControlCharacters } from "node:util";
 import { spawnSync } from "node:child_process";
 import stringWidth from "string-width";
-import { ReviewList } from "../src/ui/ReviewList.js";
+import { ReviewList, visibleListRows } from "../src/ui/ReviewList.js";
+
+test("el separador ocupa una fila sin cambiar la selección de commits", () => {
+  const items = [
+    { label: "↑ local", highlighted: true, reviewStatus: "unreviewed" as const },
+    { label: "remote", separatorBefore: "Publicados", reviewStatus: "reviewed" as const },
+    { label: "older" },
+  ];
+  const output = stripVTControlCharacters(renderToString(createElement(ReviewList, {
+    items, index: 1, width: 30, rows: 3, empty: "Vacío",
+  }), { columns: 30 }));
+  assert.match(output, /↑ local\n--- Publicados -+\n› ● remote/);
+  assert.equal(output.split("\n").length, 3);
+  assert.deepEqual(visibleListRows(items, 1, 1), [{ item: items[1], index: 1 }]);
+  assert.deepEqual(visibleListRows(items, 2, 2), [{ item: items[1], index: 1 }, { item: items[2], index: 2 }]);
+});
 
 test("el punto de revisión no sustituye el estado Git ni la selección", () => {
   const output = stripVTControlCharacters(renderToString(createElement(ReviewList, {

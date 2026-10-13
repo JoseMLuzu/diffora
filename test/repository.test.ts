@@ -30,6 +30,46 @@ async function fixture(t: { after: (fn: () => Promise<void>) => void }) {
   git(root, "config", "commit.gpgsign", "false");
   return root;
 }
+test("commits sin push se comparan con upstream y cambian tras publicar", async (t) => {
+  const root = await fixture(t);
+  const repo = await Repository.discover(root);
+  git(root, "commit", "--allow-empty", "-m", "First");
+  assert.equal((await repo.commits())[0]!.pushStatus, "unpushed");
+  const remote = await mkdtemp(join(tmpdir(), "terminal-review-remote-"));
+  t.after(() => rm(remote, { recursive: true, force: true }));
+  git(remote, "init", "--bare", "-b", "main");
+  git(root, "remote", "add", "origin", remote);
+  git(root, "push", "-u", "origin", "main");
+  git(root, "commit", "--allow-empty", "-m", "Local");
+  assert.deepEqual((await repo.commits()).map((commit) => commit.pushStatus), ["unpushed", "pushed"]);
+  const localHash = git(root, "rev-parse", "HEAD").trim();
+  assert.equal((await repo.commit(localHash)).pushStatus, "unpushed");
+  // A diverged upstream must not turn local commits into published commits.
+  git(root, "checkout", "-b", "incoming", "origin/main");
+  git(root, "commit", "--allow-empty", "-m", "Remote");
+  git(root, "push", "origin", "incoming:main");
+  git(root, "checkout", "main");
+  assert.deepEqual((await repo.commits()).map((commit) => commit.pushStatus), ["unpushed", "pushed"]);
+  git(root, "merge", "--no-edit", "origin/main");
+  const commits = await repo.commits();
+  assert.equal(commits.find((commit) => commit.title === "Local")!.pushStatus, "unpushed");
+  assert.equal(commits.find((commit) => commit.title === "Remote")!.pushStatus, "pushed");
+  assert.equal(commits[0]!.pushStatus, "unpushed");
+  const index = await readFile(join(root, ".git", "index"));
+  const status = git(root, "status", "--porcelain=v1");
+  await repo.commits();
+  assert.deepEqual(await readFile(join(root, ".git", "index")), index);
+  assert.equal(git(root, "status", "--porcelain=v1"), status);
+  git(root, "push", "origin", "main");
+  assert.ok((await repo.commits()).every((commit) => commit.pushStatus === "pushed"));
+  assert.equal((await repo.commit(localHash)).pushStatus, "pushed");
+  // Without upstream (including detached HEAD), remote-tracking refs are used.
+  git(root, "branch", "--unset-upstream");
+  git(root, "commit", "--allow-empty", "-m", "No upstream");
+  assert.equal((await repo.commits())[0]!.pushStatus, "unpushed");
+  git(root, "checkout", "--detach");
+  assert.deepEqual((await repo.commits()).slice(0, 2).map((commit) => commit.pushStatus), ["unpushed", "pushed"]);
+});
 test("historial vacío, raíz desde subcarpeta y primer commit", async (t) => {
   const root = await fixture(t);
   await mkdir(join(root, "sub"));
