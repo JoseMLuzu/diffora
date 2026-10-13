@@ -101,7 +101,10 @@ test("instalador personal es idempotente y conserva skills existentes", async (t
   const home = await mkdtemp(join(tmpdir(), "review skills "));
   t.after(() => rm(home, { recursive: true, force: true }));
   const results = await installSkills(home);
-  assert.equal(results.length, 2);
+  assert.equal(results.length, 4);
+  const diffora = join(home, ".agents", "skills", "diffora", "SKILL.md");
+  assert.match(await readFile(diffora, "utf8"), /name: diffora/);
+  assert.match(await readFile(diffora, "utf8"), /`diffora --open`/);
   const codex = join(home, ".agents", "skills", "terminal-review", "SKILL.md");
   const claude = join(home, ".claude", "skills", "terminal-review", "SKILL.md");
   assert.match(await readFile(codex, "utf8"), /name: terminal-review/);

@@ -4,19 +4,19 @@ import { homedir } from "node:os";
 import { join, dirname } from "node:path";
 
 export async function installSkills(home = homedir()): Promise<string[]> {
-  const template = await readFile(
-    new URL("../../integrations/terminal-review/SKILL.md", import.meta.url),
-    "utf8",
-  );
-  const targets = [
-    join(home, ".agents", "skills", "terminal-review", "SKILL.md"),
-    join(home, ".claude", "skills", "terminal-review", "SKILL.md"),
-  ];
+  const targets = (await Promise.all(["diffora", "terminal-review"].map(async (name) => {
+    const template = await readFile(
+      new URL(`../../integrations/${name}/SKILL.md`, import.meta.url), "utf8",
+    );
+    return [".agents", ".claude"].map((client) => ({
+      target: join(home, client, "skills", name, "SKILL.md"), template,
+    }));
+  }))).flat();
   const results: string[] = [];
   const previousTemplates = new Set([
     "1dfd0b403055fff5f5bf135efb1845cfa96adf06d769d0ce82aced58853b5b65",
   ]);
-  for (const target of targets) {
+  for (const { target, template } of targets) {
     await mkdir(dirname(target), { recursive: true });
     try {
       await writeFile(target, template, { flag: "wx" });
