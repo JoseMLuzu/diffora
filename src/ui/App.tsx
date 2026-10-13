@@ -11,6 +11,7 @@ import { editorLocation } from "../application/reviewWorkflow.js";
 import { diffKey, isSplitDiff, diffRowCount, diffPageSize } from "../application/state.js";
 import { fit } from "./text.js";
 import { safeText } from "../core/diff.js";
+import { usePanelResize } from "./usePanelResize.js";
 function Panel({
   title,
   active,
@@ -74,11 +75,14 @@ export function App({ repo, registerFlush }: { repo: Repository; registerFlush?:
   const rows = Math.max(1, height - 3);
   const split = isSplitDiff({ ...state, diffColumns: size.width });
   const expanded = split && state.panel === 2 && !!state.diff;
+  const { widths, resizing, handleMouse } = usePanelResize(size.width, height,
+    !narrow && !expanded && state.overlay === "none" && !state.noteEditing && !state.searchEditing && !quitting);
   const pageSize = diffPageSize(state, rows);
   useEffect(() => {
     dispatch({ type: "diff-viewport", columns: size.width, rows });
   }, [rows, size.width, dispatch]);
   useInput((input, key) => {
+    if (handleMouse(input)) return;
     if (key.ctrl && input === "c") {
       quit(true);
       return;
@@ -164,9 +168,9 @@ export function App({ repo, registerFlush }: { repo: Repository; registerFlush?:
     if (key.upArrow || key.downArrow)
       dispatch({ type: "move", delta: key.upArrow ? -1 : 1, pageSize });
   });
-  const leftWidth = narrow ? size.width : Math.floor(size.width * 0.28);
-  const filesWidth = narrow ? size.width : Math.floor(size.width * 0.25);
-  const diffWidth = narrow || expanded ? size.width : size.width - leftWidth - filesWidth;
+  const leftWidth = narrow ? size.width : widths[0];
+  const filesWidth = narrow ? size.width : widths[1];
+  const diffWidth = narrow || expanded ? size.width : widths[2];
   const source = selectedSource(state);
   const file = state.files[state.fileIndex];
   const visible = visibleFiles(state);
@@ -307,7 +311,7 @@ export function App({ repo, registerFlush }: { repo: Repository; registerFlush?:
       </Text>
       <Text {...(state.error ? { color: "red" } : { dimColor: true })}>
         {fit(
-          state.error || state.storageWarning || state.notice ||
+          (resizing ? `Anchos: commits ${leftWidth} · archivos ${filesWidth} · diff ${diffWidth}` : "") || state.error || state.storageWarning || state.notice ||
             `${state.diff?.truncated ? "AVISO: diff truncado · " : ""}${loading ? "Cargando…" : "Listo"} · ${sourceTitle} · panel ${state.panel + 1}/3 · ${state.searchQuery || state.onlyRemaining ? `${visible.length}/${state.files.length} encontrados · ` : ""}${state.diff?.image ? "imagen · v anterior/nueva" : `filas ${state.diff?.lines.length ? state.scroll + 1 : 0}/${diffRowCount(state)} · ${split ? "paralelo" : "unificado"}`}${location ? ` · e L${location.line}` : ""}`,
           size.width,
         )}

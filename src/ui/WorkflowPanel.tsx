@@ -19,6 +19,7 @@ export function WorkflowPanel({ state, width, rows }: { state: State; width: num
       "/ buscar archivos · Ctrl+U borrar",
       "h historial · w pendientes · r actualizar",
       "Enter abrir · Tab cambiar panel · Esc volver",
+      "Arrastra bordes entre paneles (≥110 columnas)",
       "↑ commit sin push · --- separa publicados",
       "q guardar y salir · Ctrl+C salir",
       "Estado local · cambios externos cada 2 s",

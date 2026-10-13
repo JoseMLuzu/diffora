@@ -6,6 +6,7 @@ import { openTerminal } from "./application/openTerminal.js";
 import { installSkills } from "./application/installSkills.js";
 import type { Category } from "./core/models.js";
 import { safeText } from "./core/diff.js";
+import { DISABLE_MOUSE } from "./ui/panelResize.js";
 async function main() {
   const { values, positionals } = parseArgs({
     options: {
@@ -123,19 +124,23 @@ async function main() {
     throw new Error("Diffora requiere una terminal interactiva (TTY).");
   let flush = async () => {};
   const registerFlush = (save: () => Promise<void>) => { flush = save; };
-  const instance = render(React.createElement(App, { repo, registerFlush }), {
-    exitOnCtrlC: false,
-  });
-  const stop = () => { void flush().catch((error: unknown) => console.error(safeText(String(error)))).finally(() => instance.unmount()); };
-  process.once("SIGTERM", stop);
-  process.once("SIGINT", stop);
+  // Anchor mouse coordinates to the top-left and restore the user's screen on exit.
+  process.stdout.write("\x1b[?1049h\x1b[H");
+  let instance: ReturnType<typeof render> | undefined;
+  const stop = () => { void flush().catch((error: unknown) => console.error(safeText(String(error)))).finally(() => instance?.unmount()); };
   try {
+    instance = render(React.createElement(App, { repo, registerFlush }), {
+      exitOnCtrlC: false,
+    });
+    process.once("SIGTERM", stop);
+    process.once("SIGINT", stop);
     await instance.waitUntilExit();
   } finally {
     await flush().catch((error: unknown) => console.error(safeText(String(error))));
     process.off("SIGTERM", stop);
     process.off("SIGINT", stop);
-    instance.cleanup();
+    try { instance?.cleanup(); }
+    finally { process.stdout.write(`${DISABLE_MOUSE}\x1b[?1049l`); }
   }
 }
 main().catch((error: unknown) => {

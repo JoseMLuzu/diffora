@@ -17,7 +17,7 @@ import zlib
 PROJECT = Path(__file__).resolve().parent.parent
 
 def git(root, *args):
-    subprocess.run(['git', *args], cwd=root, check=True, capture_output=True)
+    return subprocess.run(['git', *args], cwd=root, check=True, capture_output=True).stdout
 
 def collect(fd, process, expected, timeout=8):
     output = b''
@@ -57,7 +57,30 @@ def session(root, width, exit_key, image=False):
     process = subprocess.Popen(['node', str(PROJECT / 'dist/cli.js'), '--repo', str(root)],
                                stdin=slave, stdout=slave, stderr=slave, start_new_session=True, env={**os.environ, 'FORCE_COLOR':'3', 'TERMINAL_REVIEW_STATE_DIR': cache.name})
     try:
-        collect(master, process, 'Historial')
+        opening = collect(master, process, 'Historial')
+        opening += drain_for(master, process, 0.2)
+        if b'Publicados' not in opening:
+            opening += collect(master, process, 'Publicados')
+        assert '↑'.encode() in opening and b'\x1b[33m' in opening, 'Unpushed commits have no yellow arrow'
+        assert b'--- Publicados' in opening, 'Published history separator is missing'
+        assert b'\x1b[?1049h' in opening, 'Alternate screen was not enabled'
+        if width >= 110:
+            assert b'\x1b[?1002h' in opening and b'\x1b[?1006h' in opening, 'Drag reporting was not enabled'
+            # Left edge: first panel grows, files shrink, diff stays unchanged.
+            os.write(master, b'\x1b[<0;39;5M\x1b[<32;49;5M')
+            collect(master, process, 'Anchos: commits 49 · archivos 25 · diff 66')
+            os.write(master, b'\x1b[<0;49;5m')
+            drain_for(master, process, 0.1)
+            # Right edge uses the new layout and leaves the first panel alone.
+            os.write(master, b'\x1b[<0;74;5M\x1b[<32;84;5M')
+            collect(master, process, 'Anchos: commits 49 · archivos 35 · diff 56')
+            # Drag beyond the window clamps at the diff's minimum width.
+            os.write(master, b'\x1b[<32;999;5M')
+            collect(master, process, 'Anchos: commits 49 · archivos 71 · diff 20')
+            os.write(master, b'\x1b[<32;74;5M')
+            collect(master, process, 'Anchos: commits 49 · archivos 25 · diff 66')
+            os.write(master, b'\x1b[<0;74;5m')
+            drain_for(master, process, 0.1)
         os.write(master, b'w')
         collect(master, process, 'Pendientes')
         # Open files and then the diff; the pending working-tree content must appear.
@@ -67,6 +90,9 @@ def session(root, width, exit_key, image=False):
             drain_for(master, process, 0.2)
             os.write(master, b'/')
             collect(master, process, 'Enter aplicar')
+            # Late mouse reports must never become search text.
+            os.write(master, b'\x1b[<0;49;5M\x1b[<32;59;5M\x1b[<0;59;5m')
+            drain_for(master, process, 0.1)
             # Shortcut letters must be ordinary text while the search field is active.
             os.write(master, b'hwrq')
             collect(master, process, 'Sin coincidencias')
@@ -170,7 +196,7 @@ def session(root, width, exit_key, image=False):
             assert b'\x1b[38;2;255;158;69m' in marked and '●'.encode() in marked, 'File needs-review has no orange dot'
             drain_for(master, process, 0.1)
             os.write(master, b'\x1b')
-            marked = collect(master, process, 'First')
+            marked = collect(master, process, 'Local')
             marked += drain_for(master, process, 0.15)
             assert b'\x1b[38;2;255;158;69m' in marked and '●'.encode() in marked, f'Commit needs-review has no orange dot: {marked.decode(errors="replace")}'
             drain_for(master, process, 0.1)
@@ -193,6 +219,8 @@ def session(root, width, exit_key, image=False):
                     if error.errno != errno.EIO:
                         raise
         assert process.poll() == 0, f'Exit failed: {final_output.decode(errors="replace")[-2000:]}'
+        assert b'\x1b[?1002l' in final_output and b'\x1b[?1006l' in final_output, 'Mouse reporting was not restored'
+        assert b'\x1b[?1049l' in final_output, 'Original screen was not restored'
         assert termios.tcgetattr(slave) == initial, 'Terminal settings were not restored'
         print(f'PASS PTY {width} columns, exit {exit_key!r}, image={image}')
     finally:
@@ -216,6 +244,10 @@ with tempfile.TemporaryDirectory(prefix='terminal-review-pty-') as folder:
     (root / 'sample.txt').write_text('before\n')
     git(root, 'add', '.')
     git(root, 'commit', '-m', 'First')
+    git(root, 'update-ref', 'refs/remotes/origin/main', git(root, 'rev-parse', 'HEAD').decode().strip())
+    (root / 'sample.txt').write_text('local\n')
+    git(root, 'add', 'sample.txt')
+    git(root, 'commit', '-m', 'Local')
     (root / 'sample.txt').write_text('working\n' * 100)
     for width, exit_key in [(140, b'q'), (80, b'\x03'), (40, b'q')]:
         session(root, width, exit_key)
