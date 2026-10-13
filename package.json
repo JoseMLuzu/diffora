@@ -3,7 +3,6 @@
   "version": "0.1.0",
   "description": "Read-only local Git review in your terminal",
   "type": "module",
-  "private": true,
   "bin": {
     "diffora": "dist/cli.js",
     "terminal-review": "dist/cli.js"
@@ -25,7 +24,8 @@
     "test": "node --import tsx --test test/*.test.ts",
     "test:terminal": "npm run build && python3 scripts/terminal-smoke.py",
     "test:workflow": "npm run build && python3 scripts/workflow-smoke.py",
-    "prepare": "npm run build"
+    "prepare": "npm run build",
+    "prepublishOnly": "npm run typecheck && npm test && npm run build"
   },
   "dependencies": {
     "ink": "7.0.6",
@@ -56,5 +56,9 @@
     "terminal",
     "tui",
     "ink"
-  ]
+  ],
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  }
 }
