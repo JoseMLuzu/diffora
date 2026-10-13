@@ -13,6 +13,17 @@ diffora
 
 `npm i diffora` (sin `--global`) lo instala solo en la carpeta actual. En ese caso, entra al repositorio que quieres revisar y ejecuta `npx diffora`, o pasa su ruta con `npx diffora --repo /ruta/al/repositorio`. Para disponer de `diffora` directamente desde cualquier carpeta, usa la instalación global. Comprueba la versión con `diffora --version` o `npx diffora --version`.
 
+Si la instalación global falla con `EEXIST` en `.../bin/terminal-review`, hay un enlace global antiguo que ocupa el alias compatible de Diffora. Retira ese enlace e instala el paquete con la misma versión de Node que usas habitualmente:
+
+```sh
+npm uninstall --global terminal-review
+npm install --global diffora
+rehash # zsh: actualiza la búsqueda de comandos
+diffora --version
+```
+
+Esto solo elimina el comando global antiguo; no borra la carpeta del proyecto fuente. No hace falta usar `--force`.
+
 Si prefieres trabajar desde el código fuente, sigue la instalación que se explica a continuación.
 
 ## Instalación

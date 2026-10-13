@@ -30,6 +30,17 @@ Already in another directory? Run `diffora --repo "/path/to/your project"`. The 
 
 **Local vs. global install:** `npm i diffora` installs into the current project's `node_modules`; run it there with `npx diffora`. Use `npm install --global diffora` if you want the bare `diffora` command from any directory. Check the CLI with `diffora --version` (or `npx diffora --version` for a local install).
 
+If global installation stops with `EEXIST` for `.../bin/terminal-review`, an older globally linked `terminal-review` command is occupying Diffora's compatibility alias. Remove that old global link, then install Diffora:
+
+```sh
+npm uninstall --global terminal-review
+npm install --global diffora
+rehash # zsh: refresh the command lookup
+diffora --version
+```
+
+Run these with the same Node installation you use for Diffora (for example, the same `fnm` version). This does not remove the source checkout; it only removes the old global command.
+
 > **First run:** press `w` for pending changes or `h` for commits. Use ↑/↓ and Enter to move from a category or commit to its files, then to a diff. Press `?` for help and `q` to save and exit.
 
 ### What you can review
