@@ -51,6 +51,14 @@ The `↑` indicator uses local remote-tracking references. Diffora does not fetc
 - **Fits your terminal:** keyboard navigation, one panel at a time on narrow screens, and draggable panel borders on wide screens.
 - **Keeps review local:** progress is saved per repository; export a Markdown report when you want a record.
 
+## Compare code side by side
+
+Press `s` while viewing a text diff to put the previous version on the left and the new version on the right. Red and green backgrounds highlight changed lines, with stronger emphasis on the edited parts. Press `s` again to return to the unified diff.
+
+![Diffora's expanded side-by-side diff with previous code on the left and new code on the right](assets/side-by-side-diff.svg)
+
+*Real terminal output from the same sample repository. Between 80 and 109 columns, the diff fills the screen; colors may vary by terminal theme.*
+
 ## Keyboard guide
 
 | Key | Action |
