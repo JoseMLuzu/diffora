@@ -131,6 +131,7 @@ async function main() {
   try {
     instance = render(React.createElement(App, { repo, registerFlush }), {
       exitOnCtrlC: false,
+      interactive: true,
     });
     process.once("SIGTERM", stop);
     process.once("SIGINT", stop);

@@ -20,6 +20,17 @@ Git access is read-only: Diffora does not stage, commit, check out or push. Note
 - Navigate with the keyboard, use a single panel in narrow terminals, or drag panel borders in wide terminals.
 - Optionally launch from Claude Code or Codex; use plain text mode without a TTY.
 
+## Install from npm
+
+The first npm release is being prepared. Once `diffora@0.1.0` is published, install it with:
+
+```sh
+npm install --global diffora
+diffora
+```
+
+Until the release is available, use the source installation below. Node.js 22.13+ and Git are required.
+
 ## Install from source
 
 Requirements: **Node.js 22.13+** (Node 24 recommended), npm, Git on PATH and an interactive terminal. Python 3 is needed only for PTY tests. Keep npm optional dependencies enabled: Sharp uses native optional packages.
@@ -41,7 +52,7 @@ diffora
 diffora --repo "/path/to/my project"
 ```
 
-The package is not published to npm; `npm install -g diffora` is not the installation method for this project. Global installation needs a writable npm prefix. Without it, run `node /path/to/diffora/dist/cli.js --repo /path/to/project`.
+Global installation needs a writable npm prefix. Without it, run `node /path/to/diffora/dist/cli.js --repo /path/to/project`.
 
 `terminal-review` remains a compatibility alias. Rebuild a linked source installation after updating it; reinstall globally if command mappings changed.
 

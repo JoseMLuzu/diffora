@@ -25,3 +25,21 @@ npm run build
 For input, layout, lifecycle or workflow changes, also run `npm run test:terminal` and `npm run test:workflow` on macOS/Linux with Python 3. Describe what changed, why, how it was verified, and any remaining limitations. Include terminal dimensions and reproduction steps for UI issues. Keep credentials, private code and private review notes out of reports.
 
 Contributions are provided under the project's MIT license.
+
+## Publishing a release (maintainers)
+
+Run these commands from the project root. Before the first publication, check that the name is available with `npm view diffora name --registry=https://registry.npmjs.org`. A network error does not establish availability.
+
+```sh
+npm login --registry=https://registry.npmjs.org
+npm whoami --registry=https://registry.npmjs.org
+npm run typecheck
+npm test
+npm run build
+npm pack --dry-run
+npm publish --access public
+```
+
+`prepublishOnly` repeats type checking, tests and compilation before publication. Inspect the package contents before publishing; the package includes compiled code, skills, documentation and the MIT license. Never commit npm credentials. Complete authentication and any two-factor prompt in your own terminal.
+
+After publishing, verify the release with `npm view diffora version` and test installation in a clean environment. Change the README release status only after confirming publication. Each subsequent release needs a new version; npm does not allow replacing an existing name/version. Coordinate the Git tag and changelog with that release.

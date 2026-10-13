@@ -2,6 +2,17 @@
 
 Revisión local de cambios de Git después de trabajar con agentes de programación. Interfaz React + Ink, Git exclusivamente de lectura: no contiene acciones de staging, commits, checkout, push ni escrituras en el repositorio inspeccionado. Progreso, notas e informes se guardan fuera del repositorio; abrir un editor es una acción explícita del usuario.
 
+## Instalación desde npm
+
+La primera publicación está preparada, pero aún requiere completar `npm login` y `npm publish`. Cuando `diffora@0.1.0` esté disponible:
+
+```sh
+npm install --global diffora
+diffora
+```
+
+Mientras tanto, usa la instalación desde el código fuente que se explica a continuación.
+
 ## Instalación
 
 Requisitos: Node.js **24 LTS recomendado** (mínimo 22.13), npm, Git en PATH y una terminal interactiva. Compatibilidad comprobada antes de instalar: [Ink 7](https://github.com/vadimdemedes/ink/releases/tag/v7.0.0) requiere Node ≥22 y React ≥19.2; el proyecto fija Ink 7.0.6 y React 19.2.4. [Calendario LTS de Node](https://github.com/nodejs/Release).
