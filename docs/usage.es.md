@@ -4,14 +4,14 @@ Revisión local de cambios de Git después de trabajar con agentes de programaci
 
 ## Instalación desde npm
 
-La primera publicación está preparada, pero aún requiere completar `npm login` y `npm publish`. Cuando `diffora@0.1.0` esté disponible:
+Instala el paquete y ejecuta Diffora dentro del repositorio que quieres revisar:
 
 ```sh
 npm install --global diffora
 diffora
 ```
 
-Mientras tanto, usa la instalación desde el código fuente que se explica a continuación.
+Si prefieres trabajar desde el código fuente, sigue la instalación que se explica a continuación.
 
 ## Instalación
 
