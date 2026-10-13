@@ -12,6 +12,10 @@ It reads Git without staging, committing, checking out, or pushing. Review marks
 
 [Guía en español](docs/usage.es.md) · [Contributing](CONTRIBUTING.md) · [Report an issue](https://github.com/JoseMLuzu/diffora/issues)
 
+![Diffora showing commit history, changed files, and a color-coded diff in three terminal panels](assets/terminal-panel.svg)
+
+*Captured from a temporary sample repository. Colors may vary with your terminal theme.*
+
 ## Get started
 
 Requires **Node.js 22.13+**, npm, Git, and an interactive terminal.

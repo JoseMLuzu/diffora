@@ -1,0 +1,168 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1426" height="648" viewBox="0 0 1426 648" role="img" aria-labelledby="title desc">
+<title id="title">Diffora terminal review interface</title>
+<desc id="desc">Three terminal panels showing a selected Git commit, its changed files, and a colored code diff.</desc>
+<defs><clipPath id="window"><rect x="1" y="1" width="100%" height="100%" rx="13"/></clipPath></defs>
+<rect x="1" y="1" width="1424" height="646" rx="13" fill="#121722" stroke="#343d4d" stroke-width="2"/>
+<path d="M1 14 Q1 1 14 1 H1412 Q1425 1 1425 14 V40 H1 Z" fill="#202838"/>
+<circle cx="22" cy="21" r="5" fill="#ff6b72"/>
+<circle cx="40" cy="21" r="5" fill="#f0c674"/>
+<circle cx="58" cy="21" r="5" fill="#7bd88f"/>
+<text x="713.0" y="26" text-anchor="middle" fill="#aab7ca" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="13">diffora · sample-project</text>
+<text x="20.0" y="67" fill="#d8dee9" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" font-weight="700" xml:space="preserve">Diffora · Historial · /private/tmp/d-0vmd14n9/sample-project</text>
+<text x="20.0" y="87" fill="#8994a5" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">┌─────────────────────────────────────────┐┌─────────────────────────────────────┐</text>
+<text x="758.0" y="87" fill="#75d6de" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">┌──────────────────────────────────────────────────────────────────────┐</text>
+<text x="20.0" y="107" fill="#8994a5" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">│</text>
+<text x="29.0" y="107" fill="#8994a5" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" font-weight="700" xml:space="preserve">Últimos 30 commits</text>
+<text x="398.0" y="107" fill="#8994a5" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">││</text>
+<text x="416.0" y="107" fill="#8994a5" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" font-weight="700" xml:space="preserve">Archivos · 0/2 ✓ · f3219c9</text>
+<text x="749.0" y="107" fill="#8994a5" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">│</text>
+<text x="758.0" y="107" fill="#75d6de" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">│</text>
+<text x="767.0" y="107" fill="#75d6de" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" font-weight="700" xml:space="preserve">Diff · src/review.ts</text>
+<text x="1397.0" y="107" fill="#75d6de" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">│</text>
+<rect x="65.0" y="112" width="333.0" height="20" fill="#f0c674"/>
+<rect x="452.0" y="112" width="135.0" height="20" fill="#d8dee9"/>
+<text x="20.0" y="127" fill="#8994a5" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">│</text>
+<text x="29.0" y="127" fill="#75d6de" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">›</text>
+<text x="47.0" y="127" fill="#8994a5" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">·</text>
+<text x="65.0" y="127" fill="#121722" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" font-weight="700" xml:space="preserve">↑ f3219c9 2026-10-13 feat(review): t…</text>
+<text x="398.0" y="127" fill="#8994a5" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">││</text>
+<text x="416.0" y="127" fill="#75d6de" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">›</text>
+<text x="434.0" y="127" fill="#8994a5" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">·</text>
+<text x="452.0" y="127" fill="#121722" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">M src/review.ts</text>
+<text x="749.0" y="127" fill="#8994a5" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">│</text>
+<text x="758.0" y="127" fill="#75d6de" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">│</text>
+<text x="767.0" y="127" fill="#d8dee9" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">diff --git a/src/review.ts b/src/review.ts</text>
+<text x="1397.0" y="127" fill="#75d6de" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">│</text>
+<text x="20.0" y="147" fill="#8994a5" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">│</text>
+<text x="29.0" y="147" fill="#d8dee9" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" opacity="0.65" xml:space="preserve">--- Publicados --------------------------</text>
+<text x="398.0" y="147" fill="#8994a5" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">││  ·</text>
+<text x="452.0" y="147" fill="#d8dee9" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">A src/summary.ts</text>
+<text x="749.0" y="147" fill="#8994a5" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">│</text>
+<text x="758.0" y="147" fill="#75d6de" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">│</text>
+<text x="767.0" y="147" fill="#d8dee9" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">index ff6e094..2562d9b 100644</text>
+<text x="1397.0" y="147" fill="#75d6de" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">│</text>
+<text x="20.0" y="167" fill="#8994a5" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">│  ·</text>
+<text x="65.0" y="167" fill="#d8dee9" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">5d47647 2026-10-12 feat: start local…</text>
+<text x="398.0" y="167" fill="#8994a5" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">││</text>
+<text x="749.0" y="167" fill="#8994a5" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">│</text>
+<text x="758.0" y="167" fill="#75d6de" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">│</text>
+<text x="767.0" y="167" fill="#d8dee9" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">--- a/src/review.ts</text>
+<text x="1397.0" y="167" fill="#75d6de" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">│</text>
+<text x="20.0" y="187" fill="#8994a5" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">│</text>
+<text x="398.0" y="187" fill="#8994a5" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">││</text>
+<text x="749.0" y="187" fill="#8994a5" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">│</text>
+<text x="758.0" y="187" fill="#75d6de" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">│</text>
+<text x="767.0" y="187" fill="#d8dee9" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">+++ b/src/review.ts</text>
+<text x="1397.0" y="187" fill="#75d6de" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">│</text>
+<text x="20.0" y="207" fill="#8994a5" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">│</text>
+<text x="398.0" y="207" fill="#8994a5" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">││</text>
+<text x="749.0" y="207" fill="#8994a5" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">│</text>
+<text x="758.0" y="207" fill="#75d6de" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">│@@ -1,8 +1,17 @@</text>
+<text x="1397.0" y="207" fill="#75d6de" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">│</text>
+<text x="20.0" y="227" fill="#8994a5" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">│</text>
+<text x="398.0" y="227" fill="#8994a5" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">││</text>
+<text x="749.0" y="227" fill="#8994a5" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">│</text>
+<text x="758.0" y="227" fill="#75d6de" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">│</text>
+<text x="767.0" y="227" fill="#7bd88f" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">          1 + export type ReviewStatus = &#x27;new&#x27; | &#x27;done&#x27; | &#x27;needs-revi…</text>
+<text x="1397.0" y="227" fill="#75d6de" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">│</text>
+<text x="20.0" y="247" fill="#8994a5" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">│</text>
+<text x="398.0" y="247" fill="#8994a5" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">││</text>
+<text x="749.0" y="247" fill="#8994a5" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">│</text>
+<text x="758.0" y="247" fill="#75d6de" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">│</text>
+<text x="767.0" y="247" fill="#7bd88f" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">          2 +</text>
+<text x="1397.0" y="247" fill="#75d6de" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">│</text>
+<text x="20.0" y="267" fill="#8994a5" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">│</text>
+<text x="398.0" y="267" fill="#8994a5" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">││</text>
+<text x="749.0" y="267" fill="#8994a5" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">│</text>
+<text x="758.0" y="267" fill="#75d6de" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">│</text>
+<text x="767.0" y="267" fill="#d8dee9" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">    1     3   export type ReviewFile = {</text>
+<text x="1397.0" y="267" fill="#75d6de" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">│</text>
+<text x="20.0" y="287" fill="#8994a5" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">│</text>
+<text x="398.0" y="287" fill="#8994a5" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">││</text>
+<text x="749.0" y="287" fill="#8994a5" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">│</text>
+<text x="758.0" y="287" fill="#75d6de" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">│</text>
+<text x="767.0" y="287" fill="#d8dee9" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">    2     4     path: string;</text>
+<text x="1397.0" y="287" fill="#75d6de" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">│</text>
+<text x="20.0" y="307" fill="#8994a5" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">│</text>
+<text x="398.0" y="307" fill="#8994a5" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">││</text>
+<text x="749.0" y="307" fill="#8994a5" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">│</text>
+<text x="758.0" y="307" fill="#75d6de" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">│</text>
+<text x="767.0" y="307" fill="#d8dee9" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">    3     5     changed: boolean;</text>
+<text x="1397.0" y="307" fill="#75d6de" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">│</text>
+<text x="20.0" y="327" fill="#8994a5" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">│</text>
+<text x="398.0" y="327" fill="#8994a5" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">││</text>
+<text x="749.0" y="327" fill="#8994a5" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">│</text>
+<text x="758.0" y="327" fill="#75d6de" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">│</text>
+<text x="767.0" y="327" fill="#7bd88f" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">          6 +   status: ReviewStatus;</text>
+<text x="1397.0" y="327" fill="#75d6de" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">│</text>
+<text x="20.0" y="347" fill="#8994a5" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">│</text>
+<text x="398.0" y="347" fill="#8994a5" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">││</text>
+<text x="749.0" y="347" fill="#8994a5" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">│</text>
+<text x="758.0" y="347" fill="#75d6de" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">│</text>
+<text x="767.0" y="347" fill="#d8dee9" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">    4     7   };</text>
+<text x="1397.0" y="347" fill="#75d6de" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">│</text>
+<text x="20.0" y="367" fill="#8994a5" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">│</text>
+<text x="398.0" y="367" fill="#8994a5" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">││</text>
+<text x="749.0" y="367" fill="#8994a5" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">│</text>
+<text x="758.0" y="367" fill="#75d6de" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">│</text>
+<text x="767.0" y="367" fill="#d8dee9" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">    5     8</text>
+<text x="1397.0" y="367" fill="#75d6de" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">│</text>
+<text x="20.0" y="387" fill="#8994a5" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">│</text>
+<text x="398.0" y="387" fill="#8994a5" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">││</text>
+<text x="749.0" y="387" fill="#8994a5" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">│</text>
+<text x="758.0" y="387" fill="#75d6de" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">│</text>
+<text x="767.0" y="387" fill="#d8dee9" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">    6     9   export function pendingFiles(files: ReviewFile[]): Revi…</text>
+<text x="1397.0" y="387" fill="#75d6de" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">│</text>
+<text x="20.0" y="407" fill="#8994a5" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">│</text>
+<text x="398.0" y="407" fill="#8994a5" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">││</text>
+<text x="749.0" y="407" fill="#8994a5" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">│</text>
+<text x="758.0" y="407" fill="#75d6de" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">│</text>
+<text x="767.0" y="407" fill="#ff6b72" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">    7       -   return files.filter((file) =&gt; file.changed);</text>
+<text x="1397.0" y="407" fill="#75d6de" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">│</text>
+<text x="20.0" y="427" fill="#8994a5" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">│</text>
+<text x="398.0" y="427" fill="#8994a5" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">││</text>
+<text x="749.0" y="427" fill="#8994a5" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">│</text>
+<text x="758.0" y="427" fill="#75d6de" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">│</text>
+<text x="767.0" y="427" fill="#7bd88f" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">         10 +   return files.filter(</text>
+<text x="1397.0" y="427" fill="#75d6de" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">│</text>
+<text x="20.0" y="447" fill="#8994a5" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">│</text>
+<text x="398.0" y="447" fill="#8994a5" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">││</text>
+<text x="749.0" y="447" fill="#8994a5" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">│</text>
+<text x="758.0" y="447" fill="#75d6de" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">│</text>
+<text x="767.0" y="447" fill="#7bd88f" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">         11 +     (file) =&gt; file.changed &amp;&amp; file.status !== &#x27;done&#x27;,</text>
+<text x="1397.0" y="447" fill="#75d6de" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">│</text>
+<text x="20.0" y="467" fill="#8994a5" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">│</text>
+<text x="398.0" y="467" fill="#8994a5" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">││</text>
+<text x="749.0" y="467" fill="#8994a5" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">│</text>
+<text x="758.0" y="467" fill="#75d6de" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">│</text>
+<text x="767.0" y="467" fill="#7bd88f" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">         12 +   );</text>
+<text x="1397.0" y="467" fill="#75d6de" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">│</text>
+<text x="20.0" y="487" fill="#8994a5" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">│</text>
+<text x="398.0" y="487" fill="#8994a5" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">││</text>
+<text x="749.0" y="487" fill="#8994a5" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">│</text>
+<text x="758.0" y="487" fill="#75d6de" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">│</text>
+<text x="767.0" y="487" fill="#7bd88f" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">         13 + }</text>
+<text x="1397.0" y="487" fill="#75d6de" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">│</text>
+<text x="20.0" y="507" fill="#8994a5" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">│</text>
+<text x="398.0" y="507" fill="#8994a5" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">││</text>
+<text x="749.0" y="507" fill="#8994a5" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">│</text>
+<text x="758.0" y="507" fill="#75d6de" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">│</text>
+<text x="767.0" y="507" fill="#7bd88f" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">         14 +</text>
+<text x="1397.0" y="507" fill="#75d6de" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">│</text>
+<text x="20.0" y="527" fill="#8994a5" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">│</text>
+<text x="398.0" y="527" fill="#8994a5" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">││</text>
+<text x="749.0" y="527" fill="#8994a5" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">│</text>
+<text x="758.0" y="527" fill="#75d6de" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">│</text>
+<text x="767.0" y="527" fill="#7bd88f" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">         15 + export function remainingCount(files: ReviewFile[]): nu…</text>
+<text x="1397.0" y="527" fill="#75d6de" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">│</text>
+<text x="20.0" y="547" fill="#8994a5" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">│</text>
+<text x="398.0" y="547" fill="#8994a5" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">││</text>
+<text x="749.0" y="547" fill="#8994a5" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">│</text>
+<text x="758.0" y="547" fill="#75d6de" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">│</text>
+<text x="767.0" y="547" fill="#7bd88f" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">         16 +   return pendingFiles(files).length;</text>
+<text x="1397.0" y="547" fill="#75d6de" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">│</text>
+<text x="20.0" y="567" fill="#8994a5" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">└─────────────────────────────────────────┘└─────────────────────────────────────┘</text>
+<text x="758.0" y="567" fill="#75d6de" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">└──────────────────────────────────────────────────────────────────────┘</text>
+<text x="20.0" y="587" fill="#d8dee9" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" xml:space="preserve">? ayuda · ↑↓ Enter/Tab Esc · s vista · m ✓ · n ! · / buscar · f ] j/k c e t i E · h/w r q</text>
+<text x="20.0" y="607" fill="#d8dee9" font-family="SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" opacity="0.65" xml:space="preserve">Listo · f3219c9 · panel 3/3 · filas 1/23 · unificado · e L1</text>
+</svg>
