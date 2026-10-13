@@ -1,0 +1,40 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            node: 22
+          - os: ubuntu-latest
+            node: 24
+          - os: macos-latest
+            node: 24
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+      - uses: actions/setup-python@v5
+        if: matrix.os == 'ubuntu-latest' && matrix.node == 24
+        with:
+          python-version: '3.x'
+      - run: npm run test:terminal
+        if: matrix.os == 'ubuntu-latest' && matrix.node == 24
+      - run: npm run test:workflow
+        if: matrix.os == 'ubuntu-latest' && matrix.node == 24
