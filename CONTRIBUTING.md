@@ -28,7 +28,7 @@ Contributions are provided under the project's MIT license.
 
 ## Publishing a release (maintainers)
 
-Run these commands from the project root. Before the first publication, check that the name is available with `npm view diffora name --registry=https://registry.npmjs.org`. A network error does not establish availability.
+Run these commands from the project root. Check the published version with `npm view diffora version` and bump `package.json` and `package-lock.json` to a new version before publishing.
 
 ```sh
 npm login --registry=https://registry.npmjs.org

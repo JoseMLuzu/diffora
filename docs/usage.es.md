@@ -56,7 +56,7 @@ Si prefieres instalar una copia empaquetada:
 
 ```sh
 npm pack
-npm install --global ./diffora-0.1.0.tgz
+npm install --global ./diffora-0.2.0.tgz
 diffora --repo "/ruta/a/mi repositorio"
 ```
 
