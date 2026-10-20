@@ -7,6 +7,7 @@ import { installSkills } from "./application/installSkills.js";
 import type { Category } from "./core/models.js";
 import { safeText } from "./core/diff.js";
 import { DISABLE_MOUSE } from "./ui/panelResize.js";
+import { tr } from "./core/i18n.js";
 async function main() {
   const { values, positionals } = parseArgs({
     options: {
@@ -26,10 +27,27 @@ async function main() {
     allowPositionals: true,
   });
   if (positionals.length)
-    throw new Error("Argumentos inesperados. Usa --repo <ruta>.");
+    throw new Error(tr("Argumentos inesperados. Usa --repo <ruta>.", "Unexpected arguments. Use --repo <path>."));
   if (values.help) {
     console.log(
-      "Diffora — Git de solo lectura · progreso local persistente\nUso: diffora [--repo <ruta>]\nAbrir visor desde un agente (macOS): --open [--repo <ruta>]\nChat: --text [--source unstaged|staged|untracked | --commit <hash>] [--file <n>] [--offset <n>] [--limit <1..200>]\nInstalar comandos de chat: --install-skills\nAtajos: ↑↓ Enter Tab Esc · h historial · w pendientes · r actualizar · / buscar\nm terminado/verde · n pendiente/naranja · c nota · f solo pendientes · ] siguiente archivo\nj/k bloques · s unificado/paralelo (≥80 columnas) · v imagen anterior/nueva\ne editor · t tareas · i resumen · E exportar Markdown · ? ayuda · q/Ctrl+C guardar y salir\nEditor: DIFFORA_EDITOR (code por defecto; argumentos {file}, {line}, {column})\nEstado: DIFFORA_STATE_DIR o ~/.local/state/terminal-review (fuera del repo).",
+      [
+        tr("Diffora — revisión local de Git", "Diffora — local Git review"),
+        tr("Uso: diffora [--repo <ruta>]", "Usage: diffora [--repo <path>]"),
+        "",
+        tr("Navegar: ↑↓ mover · Enter abrir · Tab cambiar panel · Esc volver", "Navigate: ↑↓ move · Enter open · Tab switch panel · Esc back"),
+        tr("Cambiar vista: h historial · w pendientes · r actualizar · / buscar", "Switch view: h history · w pending · r refresh · / search"),
+        tr("Revisar: m terminado · n revisar · c nota · f solo pendientes · ] siguiente", "Review: m done · n needs review · c note · f unfinished only · ] next"),
+        tr("Ver cambios: j/k bloques · s paralelo · v imagen anterior/nueva · e editor", "View changes: j/k hunks · s side by side · v before/after image · e editor"),
+        tr("Otras vistas: t tareas · i resumen · E exportar · ? ayuda · q/Ctrl+C salir", "More: t tasks · i summary · E export · ? help · q/Ctrl+C quit"),
+        "",
+        tr("Desde un agente (macOS): --open [--repo <ruta>]", "From an agent (macOS): --open [--repo <path>]"),
+        tr("Modo texto: --text [--source unstaged|staged|untracked | --commit <hash>]", "Text mode: --text [--source unstaged|staged|untracked | --commit <hash>]"),
+        "            [--file <n>] [--offset <n>] [--limit <1..200>]",
+        tr("Instalar comandos de chat: --install-skills", "Install chat commands: --install-skills"),
+        tr("Editor: DIFFORA_EDITOR (code por defecto; {file}, {line}, {column})", "Editor: DIFFORA_EDITOR (code by default; {file}, {line}, {column})"),
+        tr("Estado: DIFFORA_STATE_DIR o ~/.local/state/terminal-review (fuera del repo).", "State: DIFFORA_STATE_DIR or ~/.local/state/terminal-review (outside the repo)."),
+        tr("Idioma: dispositivo; DIFFORA_LANG=es|en para cambiarlo.", "Language: device setting; use DIFFORA_LANG=es|en to override."),
+      ].join("\n"),
     );
     return;
   }
@@ -48,10 +66,10 @@ async function main() {
       values.offset ||
       values.limit
     )
-      throw new Error("--install-skills se usa sin opciones de revisión.");
+      throw new Error(tr("--install-skills se usa sin opciones de revisión.", "Use --install-skills without review options."));
     console.log((await installSkills()).map(safeText).join("\n"));
     console.log(
-      "Reinicia el agente si no aparece la skill. Claude Code: /diffora · Codex: $diffora o /skills.",
+      tr("Reinicia el agente si no aparece la skill. Claude Code: /diffora · Codex: $diffora o /skills.", "Restart the agent if the skill does not appear. Claude Code: /diffora · Codex: $diffora or /skills."),
     );
     return;
   }
@@ -63,13 +81,13 @@ async function main() {
     values.limit;
   if (textOptions && !values.text)
     throw new Error(
-      "--source, --commit, --file, --offset y --limit requieren --text.",
+      tr("--source, --commit, --file, --offset y --limit requieren --text.", "--source, --commit, --file, --offset, and --limit require --text."),
     );
   if (
     values.source &&
     !["unstaged", "staged", "untracked"].includes(values.source)
   )
-    throw new Error("--source debe ser unstaged, staged o untracked.");
+    throw new Error(tr("--source debe ser unstaged, staged o untracked.", "--source must be unstaged, staged, or untracked."));
   function numberOption(
     value: string | undefined,
     name: string,
@@ -84,7 +102,7 @@ async function main() {
       Number(value) < min ||
       Number(value) > max
     )
-      throw new Error(`${name} debe ser un entero entre ${min} y ${max}.`);
+      throw new Error(tr(`${name} debe ser un entero entre ${min} y ${max}.`, `${name} must be an integer between ${min} and ${max}.`));
     return Number(value);
   }
   const offset = numberOption(values.offset, "--offset", 0, 0);
@@ -94,12 +112,12 @@ async function main() {
       ? undefined
       : numberOption(values.file, "--file", 1, 1);
   if (values.open && values.text)
-    throw new Error("--open y --text son modos distintos; elige uno.");
+    throw new Error(tr("--open y --text son modos distintos; elige uno.", "--open and --text are different modes; choose one."));
   const repo = await Repository.discover(values.repo ?? process.cwd());
   if (values.open) {
     await openTerminal(repo.root);
     console.log(
-      `Se envió la apertura del visor a Terminal.app: ${safeText(repo.root)}. Usa q para salir del visor; después vuelve a la ventana del chat.`,
+      tr(`Se envió la apertura del visor a Terminal.app: ${safeText(repo.root)}. Usa q para salir del visor; después vuelve a la ventana del chat.`, `Requested the viewer in Terminal.app: ${safeText(repo.root)}. Press q to quit the viewer, then return to the chat window.`),
     );
     return;
   }
@@ -121,7 +139,7 @@ async function main() {
     import("./ui/App.js"),
   ]);
   if (!process.stdin.isTTY || !process.stdout.isTTY)
-    throw new Error("Diffora requiere una terminal interactiva (TTY).");
+    throw new Error(tr("Diffora requiere una terminal interactiva (TTY).", "Diffora requires an interactive terminal (TTY)."));
   let flush = async () => {};
   const registerFlush = (save: () => Promise<void>) => { flush = save; };
   // Anchor mouse coordinates to the top-left and restore the user's screen on exit.

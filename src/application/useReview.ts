@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useReducer, useRef } from "react";
 import type { Repository } from "../git/repository.js";
+import { tr } from "../core/i18n.js";
 import { identityKey, emptyProgress } from "../core/progress.js";
 import { ProgressStore } from "./progressStore.js";
 import { openEditor } from "./editor.js";
@@ -45,7 +46,7 @@ export function useReview(repo: Repository) {
     store.load().then(
       (progress) => { if (alive) dispatch({ type: "progress-loaded", progress }); },
       (error: unknown) => { if (alive) dispatch({ type: "progress-loaded", progress: emptyProgress(),
-        warning: `No se cargó el progreso; el archivo original se conserva: ${String(error)}` }); },
+        warning: tr(`No se cargó el progreso; el archivo original se conserva: ${String(error)}`, `Could not load progress; the original file was kept: ${String(error)}`) }); },
     );
     return () => { alive = false; };
   }, [store]);
@@ -55,7 +56,7 @@ export function useReview(repo: Repository) {
     const timer = setTimeout(() => {
       store.save(progressOf(current.current)).then(
         () => { if (alive && current.current.storageWarning) dispatch({ type: "storage-warning", message: "" }); },
-        (error: unknown) => { if (alive) dispatch({ type: "storage-warning", message: `Progreso no guardado: ${String(error)}` }); },
+        (error: unknown) => { if (alive) dispatch({ type: "storage-warning", message: tr(`Progreso no guardado: ${String(error)}`, `Progress not saved: ${String(error)}`) }); },
       );
     }, 120);
     return () => { alive = false; clearTimeout(timer); };
@@ -90,7 +91,7 @@ export function useReview(repo: Repository) {
         const fingerprints = await pendingFingerprints(repo, pending, current.current, controller.signal);
         if (alive) dispatch({ type: "pending-audit", revision, pending, fingerprints });
       } catch (error) {
-        if (alive) dispatch({ type: "notice", message: `No se pudo comprobar cambios externos: ${String(error)}` });
+        if (alive) dispatch({ type: "notice", message: tr(`No se pudo comprobar cambios externos: ${String(error)}`, `Could not check external changes: ${String(error)}`) });
       } finally { busy = false; }
     };
     const timer = setInterval(() => { void audit(); }, 2000);
@@ -125,10 +126,10 @@ export function useReview(repo: Repository) {
       let fingerprint: string | null = null;
       try { fingerprint = await repo.fingerprint(source, file, controller.signal); }
       catch { controller.signal.throwIfAborted(); }
-      if (before !== fingerprint) throw new Error("El archivo cambió al cargar el diff; pulsa r para reintentarlo.");
+      if (before !== fingerprint) throw new Error(tr("El archivo cambió al cargar el diff; pulsa r para reintentarlo.", "The file changed while loading the diff; press r to retry."));
       if (alive) {
         dispatch({ type: "diff", key: fileKey, diff, fingerprint });
-        if (!fingerprint && source.kind !== "commit") dispatch({ type: "notice", message: "No se pudo validar este archivo: se muestra, pero no se puede marcar como terminado." });
+        if (!fingerprint && source.kind !== "commit") dispatch({ type: "notice", message: tr("No se pudo validar este archivo: se muestra, pero no se puede marcar como terminado.", "Could not verify this file: it is shown but cannot be marked done.") });
       }
     };
     load().catch((error: unknown) => {
@@ -143,20 +144,20 @@ export function useReview(repo: Repository) {
   const exportReport = async () => {
     const snapshot = current.current;
     if (snapshot.loading || snapshot.filesLoading || !selectedSource(snapshot)) {
-      dispatch({ type: "notice", message: "Espera a que cargue la lista completa antes de exportar." }); return;
+      dispatch({ type: "notice", message: tr("Espera a que cargue la lista completa antes de exportar.", "Wait for the full file list to load before exporting.") }); return;
     }
     try {
       const path = await store.exportMarkdown(reviewReport(repo.root, snapshot));
       dispatch({ type: "report-saved", path });
-    } catch (error) { dispatch({ type: "notice", message: `No se pudo exportar: ${String(error)}` }); }
+    } catch (error) { dispatch({ type: "notice", message: tr(`No se pudo exportar: ${String(error)}`, `Could not export: ${String(error)}`) }); }
   };
   const launchEditor = async () => {
     const location = editorLocation(current.current);
-    if (!location) { dispatch({ type: "notice", message: "Entra al diff y selecciona una línea primero." }); return; }
+    if (!location) { dispatch({ type: "notice", message: tr("Entra al diff y selecciona una línea primero.", "Open the diff and select a line first.") }); return; }
     try {
       await openEditor(repo.root, location);
-      dispatch({ type: "notice", message: `Enviado al editor: ${location.path}:${location.line} (archivo actual del working tree).` });
-    } catch (error) { dispatch({ type: "notice", message: `No se pudo abrir el editor: ${String(error)}` }); }
+      dispatch({ type: "notice", message: tr(`Enviado al editor: ${location.path}:${location.line} (archivo actual del working tree).`, `Sent to editor: ${location.path}:${location.line} (current working-tree file).`) });
+    } catch (error) { dispatch({ type: "notice", message: tr(`No se pudo abrir el editor: ${String(error)}`, `Could not open editor: ${String(error)}`) }); }
   };
   const openTask = async () => {
     const task = reviewTasks(current.current)[current.current.taskIndex];
@@ -169,7 +170,7 @@ export function useReview(repo: Repository) {
       if (!controller.signal.aborted && current.current.overlay === "tasks"
         && reviewTasks(current.current)[current.current.taskIndex]?.key === task.key)
         dispatch({ type: "task-open", key: task.key, ...(commit ? { commit } : {}) });
-    } catch (error) { if (!controller.signal.aborted) dispatch({ type: "notice", message: `No se pudo abrir la tarea: ${String(error)}` }); }
+    } catch (error) { if (!controller.signal.aborted) dispatch({ type: "notice", message: tr(`No se pudo abrir la tarea: ${String(error)}`, `Could not open task: ${String(error)}`) }); }
     finally { operations.current.delete(controller); }
   };
   return { state, dispatch, flush, exportReport, launchEditor, openTask };

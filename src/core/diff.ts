@@ -1,4 +1,5 @@
 import type { Diff, DiffLine } from "./models.js";
+import { tr } from "./i18n.js";
 // Replace controls visibly; never allow file contents to issue terminal commands.
 export function safeText(text: string): string {
   return text.replace(/[\x00-\x1f\x7f-\x9f\u202a-\u202e\u2066-\u2069]/g, (c) =>
@@ -30,7 +31,7 @@ export function parseDiff(patch: string, truncated = false): Diff {
       binary = true;
       lines.push({
         kind: "meta",
-        text: "Archivo binario: diferencia no disponible como texto.",
+        text: tr("Archivo binario: diferencia no disponible como texto.", "Binary file: diff unavailable as text."),
       });
     } else if (inHunk && raw.startsWith("+"))
       lines.push({ kind: "add", text: safeText(raw.slice(1)), new: next++ });
@@ -53,7 +54,7 @@ export function addedContent(content: Buffer, truncated: boolean): Diff {
       lines: [
         {
           kind: "meta",
-          text: "Archivo binario: contenido no disponible como texto.",
+          text: tr("Archivo binario: contenido no disponible como texto.", "Binary file: content unavailable as text."),
         },
       ],
       binary: true,
@@ -68,7 +69,7 @@ export function addedContent(content: Buffer, truncated: boolean): Diff {
     lines: [
       {
         kind: "header",
-        text: `@@ -0,0 +1,${rows.length} @@ (sin seguimiento)`,
+        text: `@@ -0,0 +1,${rows.length} @@ ${tr("(sin seguimiento)", "(untracked)")}`,
       },
       ...rows.slice(0, MAX_DIFF_LINES).map((row, i): DiffLine => ({
         kind: "add",

@@ -212,7 +212,7 @@ test("límites explícitos de diff y contenido nuevo", async (t) => {
 test("no repositorio y Git ausente producen errores", async (t) => {
   const path = await mkdtemp(join(tmpdir(), "not repo "));
   t.after(() => rm(path, { recursive: true, force: true }));
-  await assert.rejects(Repository.discover(path), /not a git repository/);
+  await assert.rejects(Repository.discover(path), /no es un repositorio Git/);
   const previous = process.env.PATH;
   process.env.PATH = "";
   try {

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Box, Text, useApp, useInput, useStdout } from "ink";
 import type { Repository } from "../git/repository.js";
 import { useReview } from "../application/useReview.js";
-import { categories, labels, selectedSource, visibleFiles, isReviewed, fileReviewStatus, commitReviewStatus } from "../application/state.js";
+import { categories, labels, selectedSource, visibleFiles, isReviewed, fileReviewStatus, commitReviewStatus, type State } from "../application/state.js";
 import { ReviewList as List } from "./ReviewList.js";
 import { ImagePreview } from "./ImagePreview.js";
 import { TextDiff } from "./TextDiff.js";
@@ -12,6 +12,40 @@ import { diffKey, isSplitDiff, diffRowCount, diffPageSize } from "../application
 import { fit } from "./text.js";
 import { safeText } from "../core/diff.js";
 import { usePanelResize } from "./usePanelResize.js";
+import stringWidth from "string-width";
+import { tr } from "../core/i18n.js";
+
+function shortcutHint(state: State, width: number): string {
+  const compact = width < 110;
+  let actions: string[];
+  if (state.noteEditing) actions = [tr("Enter guardar", "Enter save"), tr("Esc cancelar", "Esc cancel"), tr("Ctrl+U borrar", "Ctrl+U clear")];
+  else if (state.searchEditing) actions = [tr("Enter aplicar", "Enter apply"), tr("Esc limpiar", "Esc clear"), tr("Ctrl+U borrar", "Ctrl+U clear")];
+  else if (state.overlay === "help") actions = [tr("Esc volver", "Esc back"), tr("q salir", "q quit")];
+  else if (state.overlay === "tasks") actions = compact
+    ? ["↑↓", tr("Enter abrir", "Enter open"), tr("Esc volver", "Esc back"), tr("? ayuda", "? help")]
+    : [tr("↑↓ elegir", "↑↓ select"), tr("Enter abrir", "Enter open"), tr("Esc volver", "Esc back"), tr("? ayuda", "? help"), tr("q salir", "q quit")];
+  else if (state.overlay === "summary") actions = [tr("E exportar", "E export"), tr("Esc volver", "Esc back"), tr("? ayuda", "? help"), tr("q salir", "q quit")];
+  else if (state.panel === 0) actions = compact
+    ? [tr("↑↓ elegir", "↑↓ select"), tr("Enter abrir", "Enter open"), tr("? ayuda", "? help"), tr("q salir", "q quit")]
+    : [tr("↑↓ elegir", "↑↓ select"), tr("Enter archivos", "Enter files"), tr("h/w vista", "h/w view"), tr("? ayuda", "? help"), tr("q salir", "q quit")];
+  else if (state.panel === 1) actions = compact
+    ? ["↑↓", "Enter diff", tr("/ buscar", "/ search"), tr("? ayuda", "? help")]
+    : [tr("↑↓ elegir", "↑↓ select"), "Enter diff", tr("/ buscar", "/ search"), tr("m listo", "m done"), tr("n revisar", "n review"), tr("? ayuda", "? help"), tr("q salir", "q quit")];
+  else if (state.diff?.image) actions = compact
+    ? [tr("v comparar", "v compare"), tr("Esc volver", "Esc back"), tr("? ayuda", "? help")]
+    : [tr("v antes/después", "v before/after"), tr("m listo", "m done"), tr("n revisar", "n review"), tr("Esc volver", "Esc back"), tr("? ayuda", "? help"), tr("q salir", "q quit")];
+  else actions = compact
+    ? ["↑↓", tr("j/k bloques", "j/k hunks"), tr("s vista", "s view"), tr("? ayuda", "? help")]
+    : [tr("↑↓ desplazar", "↑↓ scroll"), tr("j/k bloques", "j/k hunks"), tr("s paralelo", "s side by side"), tr("m listo", "m done"), tr("n revisar", "n review"), tr("? ayuda", "? help"), tr("q salir", "q quit")];
+  let hint = "";
+  for (const action of actions) {
+    const next = hint ? `${hint} · ${action}` : action;
+    if (stringWidth(next) > width) break;
+    hint = next;
+  }
+  return hint;
+}
+
 function Panel({
   title,
   active,
@@ -54,7 +88,7 @@ export function App({ repo, registerFlush }: { repo: Repository; registerFlush?:
       if (force) { console.error(safeText(String(error))); exit(); }
       else {
         setQuitting(false);
-        dispatch({ type: "storage-warning", message: `No se pudo guardar: ${String(error)} · Ctrl+C salir sin guardar.` });
+        dispatch({ type: "storage-warning", message: tr(`No se pudo guardar: ${String(error)} · Ctrl+C salir sin guardar.`, `Could not save: ${String(error)} · Ctrl+C quit without saving.`) });
       }
     });
   };
@@ -184,34 +218,34 @@ export function App({ repo, registerFlush }: { repo: Repository; registerFlush?:
           reviewStatus: commitReviewStatus(state, c),
           highlighted: c.pushStatus === "unpushed",
           ...(index > 0 && c.pushStatus && state.commits[index - 1]?.pushStatus && c.pushStatus !== state.commits[index - 1]?.pushStatus
-            ? { separatorBefore: c.pushStatus === "pushed" ? "Publicados" : "Sin push" } : {}),
+            ? { separatorBefore: c.pushStatus === "pushed" ? tr("Publicados", "Pushed") : tr("Sin push", "Unpushed") } : {}),
         }))
       : categories.map((c) => ({ label: `${labels[c]} (${state.pending[c].length})` }));
   const sourceTitle =
     source?.kind === "commit"
-      ? `${source.commit.shortHash}${source.commit.parents.length > 1 ? " · merge: primer padre" : source.commit.parents.length === 0 ? " · árbol vacío" : ""}`
+      ? `${source.commit.shortHash}${source.commit.parents.length > 1 ? tr(" · merge: primer padre", " · merge: first parent") : source.commit.parents.length === 0 ? tr(" · árbol vacío", " · empty tree") : ""}`
       : source
         ? labels[source.kind]
-        : "Sin selección";
+        : tr("Sin selección", "No selection");
   const loading = state.loading || state.filesLoading || state.diffLoading;
   const location = editorLocation(state);
   return (
     <Box flexDirection="column" width={size.width}>
       <Text bold>
         {fit(
-          `Diffora · ${state.mode === "history" ? "Historial" : "Pendientes"} · ${repo.root}`,
+          `Diffora · ${state.mode === "history" ? tr("Historial", "History") : tr("Pendientes", "Pending")} · ${repo.root}`,
           size.width,
         )}
       </Text>
-      {state.overlay !== "none" ? <Panel title={state.overlay === "help" ? "Ayuda · Esc volver" : state.overlay === "tasks" ? "Tareas abiertas · Esc volver" : "Resumen de revisión · Esc volver"} active width={size.width} height={height}>
+      {state.overlay !== "none" ? <Panel title={state.overlay === "help" ? tr("Ayuda · Esc volver", "Help · Esc back") : state.overlay === "tasks" ? tr("Tareas abiertas · Esc volver", "Open tasks · Esc back") : tr("Resumen de revisión · Esc volver", "Review summary · Esc back")} active width={size.width} height={height}>
         <WorkflowPanel state={state} width={size.width - 2} rows={rows} />
       </Panel> : <Box>
         {!expanded && (!narrow || state.panel === 0) && (
           <Panel
             title={
               state.mode === "history"
-                ? state.commits.length > 30 ? "Commits y tareas anteriores" : "Últimos 30 commits"
-                : "Cambios pendientes"
+                ? state.commits.length > 30 ? tr("Commits y tareas anteriores", "Commits and older tasks") : tr("Últimos 30 commits", "Latest 30 commits")
+                : tr("Cambios pendientes", "Pending changes")
             }
             active={state.panel === 0}
             width={leftWidth}
@@ -222,13 +256,13 @@ export function App({ repo, registerFlush }: { repo: Repository; registerFlush?:
               index={state.selection}
               width={leftWidth - 2}
               rows={rows}
-              empty={state.loading ? "Cargando…" : "Historial vacío"}
+              empty={state.loading ? tr("Cargando…", "Loading…") : tr("Historial vacío", "No commits")}
             />
           </Panel>
         )}
         {!expanded && (!narrow || state.panel === 1) && (
           <Panel
-            title={`Archivos · ${reviewedCount}/${state.files.length} ✓${needsReviewCount ? ` · ${needsReviewCount} !` : ""}${state.onlyRemaining ? " · Solo pendientes" : ""} · ${sourceTitle}`}
+            title={`${tr("Archivos", "Files")} · ${reviewedCount}/${state.files.length} ✓${needsReviewCount ? ` · ${needsReviewCount} !` : ""}${state.onlyRemaining ? tr(" · Solo pendientes", " · Unfinished only") : ""} · ${sourceTitle}`}
             active={state.panel === 1}
             width={filesWidth}
             height={height}
@@ -247,14 +281,14 @@ export function App({ repo, registerFlush }: { repo: Repository; registerFlush?:
               width={filesWidth - 2}
               rows={Math.max(1, rows - (state.searchEditing || state.searchQuery ? 1 : 0))}
               empty={
-                state.filesLoading ? "Cargando…" : state.onlyRemaining ? "Sin pendientes en este filtro" : state.searchQuery ? "Sin coincidencias" : "Sin archivos modificados"
+                state.filesLoading ? tr("Cargando…", "Loading…") : state.onlyRemaining ? tr("Sin pendientes en este filtro", "No unfinished files in this filter") : state.searchQuery ? tr("Sin coincidencias", "No matches") : tr("Sin archivos modificados", "No changed files")
               }
             />
           </Panel>
         )}
         {(!narrow || state.panel === 2) && (
           <Panel
-            title={`Diff · ${fileStatus === "needs-review" ? "! " : fileStatus === "reviewed" ? "✓ " : ""}${file?.path ?? sourceTitle}${split ? " · Paralelo" : ""}`}
+            title={`Diff · ${fileStatus === "needs-review" ? "! " : fileStatus === "reviewed" ? "✓ " : ""}${file?.path ?? sourceTitle}${split ? tr(" · Paralelo", " · Side by side") : ""}`}
             active={state.panel === 2}
             width={diffWidth}
             height={height}
@@ -280,10 +314,10 @@ export function App({ repo, registerFlush }: { repo: Repository; registerFlush?:
               <Text dimColor>
                 {fit(
                   state.diffLoading
-                    ? "Cargando diferencia…"
+                    ? tr("Cargando diferencia…", "Loading diff…")
                     : file
-                      ? "Sin cambios textuales (solo metadatos)."
-                      : "Selecciona un archivo",
+                      ? tr("Sin cambios textuales (solo metadatos).", "No text changes (metadata only).")
+                      : tr("Selecciona un archivo", "Select a file"),
                   diffWidth - 2,
                 )}
               </Text>
@@ -292,27 +326,16 @@ export function App({ repo, registerFlush }: { repo: Repository; registerFlush?:
         )}
       </Box>}
       {state.noteEditing && <>
-        <Text color="#ff9e45">{fit("Nota · Enter guardar · Esc cancelar · Ctrl+U borrar", size.width)}</Text>
+        <Text color="#ff9e45">{fit(tr("Nota · Enter guardar · Esc cancelar · Ctrl+U borrar", "Note · Enter save · Esc cancel · Ctrl+U clear"), size.width)}</Text>
         <Text>{fit(`${Array.from(state.noteDraft).slice(-Math.max(1, Math.floor((size.width - 2) / 2))).join("")}▏`, size.width)}</Text>
       </>}
       <Text>
-        {fit(
-          state.noteEditing
-            ? "Escribe una nota (máximo 1000 caracteres)"
-            : state.overlay !== "none"
-              ? "? ayuda · t tareas · i resumen · E exportar · Esc volver · q"
-            : state.searchEditing
-            ? "Enter aplicar · Esc limpiar · Ctrl+U borrar"
-            : size.width < 60
-              ? "? ayuda · m ✓ · n ! · / buscar · q"
-              : `? ayuda · ↑↓ Enter/Tab Esc · ${state.diff?.image ? "v imagen" : "s vista"} · m ✓ · n ! · / buscar · f ] j/k c e t i E · h/w r q`,
-          size.width,
-        )}
+        {fit(shortcutHint(state, size.width), size.width)}
       </Text>
       <Text {...(state.error ? { color: "red" } : { dimColor: true })}>
         {fit(
-          (resizing ? `Anchos: commits ${leftWidth} · archivos ${filesWidth} · diff ${diffWidth}` : "") || state.error || state.storageWarning || state.notice ||
-            `${state.diff?.truncated ? "AVISO: diff truncado · " : ""}${loading ? "Cargando…" : "Listo"} · ${sourceTitle} · panel ${state.panel + 1}/3 · ${state.searchQuery || state.onlyRemaining ? `${visible.length}/${state.files.length} encontrados · ` : ""}${state.diff?.image ? "imagen · v anterior/nueva" : `filas ${state.diff?.lines.length ? state.scroll + 1 : 0}/${diffRowCount(state)} · ${split ? "paralelo" : "unificado"}`}${location ? ` · e L${location.line}` : ""}`,
+          (resizing ? tr(`Anchos: commits ${leftWidth} · archivos ${filesWidth} · diff ${diffWidth}`, `Widths: commits ${leftWidth} · files ${filesWidth} · diff ${diffWidth}`) : "") || state.error || state.storageWarning || state.notice ||
+            `${state.diff?.truncated ? tr("AVISO: diff truncado · ", "WARNING: diff truncated · ") : ""}${loading ? tr("Cargando…", "Loading…") : tr("Listo", "Ready")} · ${sourceTitle} · ${tr("panel", "panel")} ${state.panel + 1}/3 · ${state.searchQuery || state.onlyRemaining ? tr(`${visible.length}/${state.files.length} encontrados · `, `${visible.length}/${state.files.length} found · `) : ""}${state.diff?.image ? tr("imagen · v anterior/nueva", "image · v before/after") : tr(`filas ${state.diff?.lines.length ? state.scroll + 1 : 0}/${diffRowCount(state)} · ${split ? "paralelo" : "unificado"}`, `rows ${state.diff?.lines.length ? state.scroll + 1 : 0}/${diffRowCount(state)} · ${split ? "side by side" : "unified"}`)}${location ? ` · e L${location.line}` : ""}`,
           size.width,
         )}
       </Text>

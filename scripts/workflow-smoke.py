@@ -30,7 +30,7 @@ class Viewer:
         self.initial = termios.tcgetattr(self.slave)
         self.process = subprocess.Popen(['node', str(PROJECT / 'dist/cli.js'), '--repo', str(root)],
             stdin=self.slave, stdout=self.slave, stderr=self.slave, start_new_session=True,
-            env={**os.environ, 'FORCE_COLOR':'3', 'TERMINAL_REVIEW_STATE_DIR': str(cache),
+            env={**os.environ, 'FORCE_COLOR':'3', 'DIFFORA_LANG':'es', 'TERMINAL_REVIEW_STATE_DIR': str(cache),
                  'TERMINAL_REVIEW_EDITOR': editor, 'REVIEW_TEST_LOG': str(log)})
         self.wait('Base')
         self.drain(0.2)

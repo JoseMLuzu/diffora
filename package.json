@@ -21,7 +21,7 @@
     "dev": "tsx src/cli.ts",
     "build": "tsc",
     "typecheck": "tsc -p tsconfig.check.json",
-    "test": "node --import tsx --test test/*.test.ts",
+    "test": "node --import ./scripts/test-locale.mjs --import tsx --test test/*.test.ts",
     "test:terminal": "npm run build && python3 scripts/terminal-smoke.py",
     "test:workflow": "npm run build && python3 scripts/workflow-smoke.py",
     "prepare": "npm run build",

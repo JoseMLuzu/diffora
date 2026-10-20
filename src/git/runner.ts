@@ -1,4 +1,5 @@
 import { spawn } from "node:child_process";
+import { tr } from "../core/i18n.js";
 export const MAX_DIFF_BYTES = 1024 * 1024;
 export const MAX_QUERY_BYTES = 8 * 1024 * 1024;
 export class GitError extends Error {
@@ -48,7 +49,7 @@ export function runGitBytes(
       stderr = "";
     const timer = setTimeout(() => {
       child.kill();
-      reject(new GitError("Git excedió el límite de 15 segundos.", null));
+      reject(new GitError(tr("Git excedió el límite de 15 segundos.", "Git exceeded the 15-second limit."), null));
     }, 15_000);
     child.stdout.on("data", (chunk: Buffer) => {
       const remaining = limit - bytes;
@@ -68,7 +69,7 @@ export function runGitBytes(
       reject(
         new GitError(
           error.code === "ENOENT"
-            ? "Git no está instalado o la carpeta no existe."
+            ? tr("Git no está instalado o la carpeta no existe.", "Git is not installed or the directory does not exist.")
             : error.message,
           error.code ?? null,
         ),
@@ -79,14 +80,14 @@ export function runGitBytes(
       if (exceeded && !truncate)
         reject(
           new GitError(
-            `La consulta supera el límite de ${limit / (1024 * 1024)} MiB; no se muestra una lista parcial.`,
+            tr(`La consulta supera el límite de ${limit / (1024 * 1024)} MiB; no se muestra una lista parcial.`, `The query exceeds the ${limit / (1024 * 1024)} MiB limit; no partial list is shown.`),
             null,
           ),
         );
       else if (code !== 0 && !exceeded)
         reject(
           new GitError(
-            stderr.trim() || "Git no pudo completar la consulta.",
+            stderr.trim() || tr("Git no pudo completar la consulta.", "Git could not complete the query."),
             code,
           ),
         );

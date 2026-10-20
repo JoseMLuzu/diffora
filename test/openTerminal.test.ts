@@ -17,7 +17,7 @@ test("lanzador pasa rutas literalmente, incluidos espacios, quotes y metacaracte
   const cli = join(root, "cli ' $(touch INJECTION) `echo x`.js");
   await writeFile(
     cli,
-    "console.log(JSON.stringify({cwd:process.cwd(),args:process.argv.slice(2)}));\n",
+    "console.log(JSON.stringify({cwd:process.cwd(),args:process.argv.slice(2),lang:process.env.DIFFORA_LANG}));\n",
   );
   const result = execFileSync(
     "/bin/sh",
@@ -27,6 +27,15 @@ test("lanzador pasa rutas literalmente, incluidos espacios, quotes y metacaracte
   const parsed = JSON.parse(result) as { cwd: string; args: string[] };
   assert.ok(parsed.cwd.endsWith(root.slice(root.indexOf("review "))));
   assert.deepEqual(parsed.args, ["--repo", root]);
+  const previous = process.env.DIFFORA_LANG;
+  process.env.DIFFORA_LANG = "en";
+  try {
+    const language = JSON.parse(execFileSync("/bin/sh", ["-c", terminalCommand(root, process.execPath, cli)], { encoding: "utf8" })) as { lang: string };
+    assert.equal(language.lang, "en");
+  } finally {
+    if (previous === undefined) delete process.env.DIFFORA_LANG;
+    else process.env.DIFFORA_LANG = previous;
+  }
   await assert.rejects(access(join(root, "INJECTION")));
   assert.throws(() => shellQuote("a\0b"), /NUL/);
 });

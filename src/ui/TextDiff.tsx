@@ -4,6 +4,7 @@ import stringWidth from "string-width";
 import type { DiffLine } from "../core/models.js";
 import { splitDiff, changedSpans } from "../core/splitDiff.js";
 import { fit } from "./text.js";
+import { tr } from "../core/i18n.js";
 
 function Cell({ line, side, width, span }: {
   line?: DiffLine;
@@ -44,10 +45,10 @@ export function TextDiff({ lines, width, rows, scroll, split, fallback = false }
   const rightWidth = width - leftWidth - 1;
   return <Box flexDirection="column" width={width}>
     {split ? <Box height={1}>
-      <Box width={leftWidth}><Text bold color="red">{fit("Anterior (−)", leftWidth)}</Text></Box>
+      <Box width={leftWidth}><Text bold color="red">{fit(tr("Anterior (−)", "Before (−)"), leftWidth)}</Text></Box>
       <Text dimColor>│</Text>
-      <Box width={rightWidth}><Text bold color="green">{fit("Nueva (+)", rightWidth)}</Text></Box>
-    </Box> : fallback ? <Text color="yellow">{fit("Amplía a 80 columnas para vista paralela", width)}</Text> : null}
+      <Box width={rightWidth}><Text bold color="green">{fit(tr("Nueva (+)", "After (+)"), rightWidth)}</Text></Box>
+    </Box> : fallback ? <Text color="yellow">{fit(tr("Amplía a 80 columnas para vista paralela", "Widen to 80 columns for side-by-side view"), width)}</Text> : null}
     {split ? paired.slice(scroll, scroll + rows).map((row, index) => {
       if (row.shared) return <Text key={scroll + index} {...(row.shared.kind === "header" ? { color: "cyan" } : { dimColor: true })}>{fit(row.shared.text, width)}</Text>;
       const spans = row.before?.kind === "delete" && row.after?.kind === "add"

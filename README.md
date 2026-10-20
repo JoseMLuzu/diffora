@@ -74,6 +74,8 @@ Press `s` while viewing a text diff to put the previous version on the left and 
 
 ## Keyboard guide
 
+The bottom bar shows only the most useful keys for the active panel. Press `?` for the complete guide, grouped by task.
+
 | Key | Action |
 | --- | --- |
 | ↑ / ↓, Enter | Select, scroll, and open |
@@ -92,6 +94,20 @@ Press `s` while viewing a text diff to put the previous version on the left and 
 | `q` / Ctrl+C | Save and exit |
 
 Side-by-side diffs need at least 80 columns. Below 110 columns, Diffora shows one panel at a time. The terminal's original screen is restored on exit.
+
+## Language
+
+Diffora reads your device's preferred language when it starts. It uses Spanish for Spanish locales and English for other locales. The viewer, help, text mode, notices, and exported reports use that language. File contents, paths, and commit messages retain their original text.
+
+To choose a language for one run, set `DIFFORA_LANG`:
+
+```sh
+diffora                 # use the device language
+DIFFORA_LANG=es diffora # Spanish
+DIFFORA_LANG=en diffora # English
+```
+
+The override also works with `--repo`, `--text`, and `--open` on macOS. Run `diffora --help` to see the CLI guide in the selected language.
 
 ## Use it with Codex or Claude Code
 
@@ -139,6 +155,7 @@ Marks, notes, view preferences, and exports are stored per repository under `~/.
 | --- | --- |
 | `DIFFORA_STATE_DIR` | Choose a different progress/export directory outside the repository |
 | `DIFFORA_EDITOR` | Choose an editor; defaults to `code` and supports `{file}`, `{line}`, `{column}` |
+| `DIFFORA_LANG` | Override the detected language with `es` or `en` |
 
 For example: `DIFFORA_EDITOR="cursor --reuse-window" diffora`. The editor opens the **current working-tree file**, even while reviewing an older commit, so its line numbers may differ. The older `TERMINAL_REVIEW_STATE_DIR` and `TERMINAL_REVIEW_EDITOR` variables still work.
 

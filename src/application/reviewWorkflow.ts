@@ -2,6 +2,7 @@ import type { Commit, Source } from "../core/models.js";
 import { identityKey, parseIdentity, emptyProgress, type Progress } from "../core/progress.js";
 import { safeText } from "../core/diff.js";
 import { splitDiff } from "../core/splitDiff.js";
+import { tr } from "../core/i18n.js";
 import {
   selectedSource, visibleFiles, reviewKey, fileReviewStatus, diffRowCount, isSplitDiff,
   clearFiles, selectFile, reducer, categories, type State,
@@ -70,7 +71,7 @@ export function applyPending(s: State, pending: State["pending"], fingerprints: 
       if (marked && !next.reviewed.includes(key) && !next.needsReview.includes(key)) invalidated++;
     }
   }
-  if (invalidated) next.notice = `Cambios detectados: ${invalidated} marca(s) invalidada(s); revisa de nuevo.`;
+  if (invalidated) next.notice = tr(`Cambios detectados: ${invalidated} marca(s) invalidada(s); revisa de nuevo.`, `Changes detected: ${invalidated} review mark(s) cleared; review again.`);
   return next;
 }
 export function summary(s: State) {
@@ -128,7 +129,7 @@ export function reduceWorkflow(s: State, action: WorkflowAction | { type: string
       const candidates = visibleFiles(s).filter(({ file }) => fileReviewStatus(s, file) !== "reviewed");
       const target = candidates.find((file) => file.index > s.fileIndex) ?? candidates[0];
       return target ? selectFile({ ...s, panel: s.panel === 2 ? 2 : 1 }, target.index)
-        : { ...s, notice: "No quedan archivos por revisar en este filtro." };
+        : { ...s, notice: tr("No quedan archivos por revisar en este filtro.", "No files left to review in this filter.") };
     }
     case "hunk": {
       const a = action as Extract<WorkflowAction, { type: "hunk" }>;
@@ -141,11 +142,11 @@ export function reduceWorkflow(s: State, action: WorkflowAction | { type: string
         : positions.find((hunk) => hunk.index === s.hunkAnchor)?.position ?? s.scroll;
       const target = a.direction === 1 ? positions.find((hunk) => hunk.position > current)
         : [...positions].reverse().find((hunk) => hunk.position < current);
-      return target ? { ...s, hunkAnchor: target.index, scroll: Math.max(0, Math.min(target.position, diffRowCount(s) - a.pageSize)), notice: `Bloque: ${s.diff.lines[target.index]!.text}` }
-        : { ...s, notice: a.direction === 1 ? "No hay más bloques." : "Primer bloque alcanzado." };
+      return target ? { ...s, hunkAnchor: target.index, scroll: Math.max(0, Math.min(target.position, diffRowCount(s) - a.pageSize)), notice: tr(`Bloque: ${s.diff.lines[target.index]!.text}`, `Hunk: ${s.diff.lines[target.index]!.text}`) }
+        : { ...s, notice: a.direction === 1 ? tr("No hay más bloques.", "No more hunks.") : tr("Primer bloque alcanzado.", "At the first hunk.") };
     }
     case "note-start": {
-      if (!canReview(s)) return { ...s, notice: "Carga y valida el diff antes de añadir una nota." };
+      if (!canReview(s)) return { ...s, notice: tr("Carga y valida el diff antes de añadir una nota.", "Load and verify the diff before adding a note.") };
       const key = reviewKey(s, s.files[s.fileIndex]!);
       return { ...s, noteEditing: true, noteDraft: s.notes[key]?.text ?? "", noteTarget: key, noteFingerprint: s.fingerprints[key] ?? "" };
     }
@@ -167,7 +168,7 @@ export function reduceWorkflow(s: State, action: WorkflowAction | { type: string
         ...s, notes, noteEditing: false, noteTarget: "", noteDraft: "", noteFingerprint: "",
         reviewed: text && !stale ? s.reviewed.filter((item) => item !== key) : s.reviewed,
         needsReview: text && !stale ? [...new Set([...s.needsReview, key])] : s.needsReview,
-        notice: text ? stale ? "Nota conservada; el contenido cambió y requiere otra revisión." : "Nota guardada · pendiente de revisión." : "Nota eliminada.",
+        notice: text ? stale ? tr("Nota conservada; el contenido cambió y requiere otra revisión.", "Note kept; content changed and needs another review.") : tr("Nota guardada · pendiente de revisión.", "Note saved · needs review.") : tr("Nota eliminada.", "Note removed."),
       };
     }
     case "overlay": {
@@ -185,7 +186,7 @@ export function reduceWorkflow(s: State, action: WorkflowAction | { type: string
       let next = s;
       if (identity.kind === "commit") {
         const commit = s.commits.find((c) => c.hash === identity.commit) ?? a.commit;
-        if (!commit) return { ...s, notice: "El commit necesita cargarse antes de abrir la tarea." };
+        if (!commit) return { ...s, notice: tr("El commit necesita cargarse antes de abrir la tarea.", "Load the commit before opening this task.") };
         if (!next.commits.some((c) => c.hash === commit.hash)) next = { ...next, commits: [...next.commits, commit] };
         next = reducer(next, { type: "mode", mode: "history" });
         next = reducer(next, { type: "move", delta: next.commits.findIndex((c) => c.hash === identity.commit) - next.selection, pageSize: 1 });
@@ -197,7 +198,7 @@ export function reduceWorkflow(s: State, action: WorkflowAction | { type: string
       if (next.files.length) {
         const index = next.files.findIndex((file) => reviewKey(next, file) === a.key);
         if (index >= 0) return selectFile({ ...next, requestedFileKey: "" }, index);
-        return { ...next, requestedFileKey: "", notice: "La tarea corresponde a un cambio que ya no está disponible." };
+        return { ...next, requestedFileKey: "", notice: tr("La tarea corresponde a un cambio que ya no está disponible.", "This task refers to a change that is no longer available.") };
       }
       return next;
     }
@@ -206,6 +207,6 @@ export function reduceWorkflow(s: State, action: WorkflowAction | { type: string
     case "storage-warning":
       return { ...s, storageWarning: safeText((action as Extract<WorkflowAction, { type: "storage-warning" }>).message) };
     case "report-saved":
-      return { ...s, lastReport: (action as Extract<WorkflowAction, { type: "report-saved" }>).path, overlay: "summary", notice: "Informe Markdown exportado." };
+      return { ...s, lastReport: (action as Extract<WorkflowAction, { type: "report-saved" }>).path, overlay: "summary", notice: tr("Informe Markdown exportado.", "Markdown report exported.") };
   }
 }

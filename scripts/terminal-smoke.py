@@ -55,10 +55,12 @@ def session(root, width, exit_key, image=False):
     fcntl.ioctl(slave, termios.TIOCSWINSZ, struct.pack('HHHH', 24, width, 0, 0))
     initial = termios.tcgetattr(slave)
     process = subprocess.Popen(['node', str(PROJECT / 'dist/cli.js'), '--repo', str(root)],
-                               stdin=slave, stdout=slave, stderr=slave, start_new_session=True, env={**os.environ, 'FORCE_COLOR':'3', 'TERMINAL_REVIEW_STATE_DIR': cache.name})
+                               stdin=slave, stdout=slave, stderr=slave, start_new_session=True, env={**os.environ, 'FORCE_COLOR':'3', 'DIFFORA_LANG':'es', 'TERMINAL_REVIEW_STATE_DIR': cache.name})
     try:
         opening = collect(master, process, 'Historial')
         opening += drain_for(master, process, 0.2)
+        assert (b'Enter abrir' if width < 110 else b'Enter archivos') in opening, 'The shortcut bar must match the active panel'
+        assert b'? ayuda' in opening, 'The shortcut bar must point to grouped help'
         if b'Publicados' not in opening:
             opening += collect(master, process, 'Publicados')
         assert '↑'.encode() in opening and b'\x1b[33m' in opening, 'Unpushed commits have no yellow arrow'
@@ -104,7 +106,7 @@ def session(root, width, exit_key, image=False):
             os.write(master, b'SAMPLE')
             collect(master, process, '/ SAMPLE')
             os.write(master, b'\r')
-            collect(master, process, '/ buscar')
+            collect(master, process, '/ buscar' if width >= 60 else '↑↓ · Enter diff')
             drain_for(master, process, 0.1)
         os.write(master, b'\r')
         if image:
@@ -204,7 +206,10 @@ def session(root, width, exit_key, image=False):
         drain_for(master, process, 0.4)
         # Identical refreshed content may not repaint; verify the UI still responds.
         os.write(master, b'?')
-        collect(master, process, 'Ayuda')
+        help_frame = collect(master, process, 'Ayuda') + drain_for(master, process, 0.1)
+        for heading in ('NAVEGAR', 'REVISAR', 'DIFERENCIAS', 'MÁS'):
+            assert heading.encode() in help_frame, f'Missing help section {heading!r}'
+        assert b'Ctrl+C salir' in help_frame, 'Exit control must remain visible in help'
         os.write(master, b'\x1b')
         drain_for(master, process, 0.1)
         os.write(master, exit_key)
@@ -251,6 +256,28 @@ with tempfile.TemporaryDirectory(prefix='terminal-review-pty-') as folder:
     (root / 'sample.txt').write_text('working\n' * 100)
     for width, exit_key in [(140, b'q'), (80, b'\x03'), (40, b'q')]:
         session(root, width, exit_key)
+
+    # The same terminal UI uses English when the device language is English.
+    with tempfile.TemporaryDirectory(prefix='diffora-en-state-') as state_dir:
+        master, slave = pty.openpty()
+        fcntl.ioctl(slave, termios.TIOCSWINSZ, struct.pack('HHHH', 24, 80, 0, 0))
+        process = subprocess.Popen(['node', str(PROJECT / 'dist/cli.js'), '--repo', str(root)],
+            stdin=slave, stdout=slave, stderr=slave, start_new_session=True,
+            env={**os.environ, 'DIFFORA_LANG':'en', 'TERMINAL_REVIEW_STATE_DIR': state_dir})
+        try:
+            collect(master, process, 'History')
+            drain_for(master, process, 0.1)
+            os.write(master, b'?')
+            help_frame = collect(master, process, 'Help') + drain_for(master, process, 0.1)
+            assert b'NAVIGATE' in help_frame and b'REVIEW' in help_frame, 'English help is missing'
+            os.write(master, b'q')
+            drain_for(master, process, 0.5)
+            assert process.wait(timeout=5) == 0, 'English viewer did not exit'
+            print('PASS PTY 80 columns, English locale')
+        finally:
+            if process.poll() is None:
+                process.terminate(); process.wait(timeout=5)
+            os.close(master); os.close(slave)
 
     def png(rgb):
         def chunk(name, data):

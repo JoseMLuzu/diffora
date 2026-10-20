@@ -3,6 +3,7 @@ import { Box, Text } from "ink";
 import type { ImageDiff } from "../core/models.js";
 import { rasterRows } from "../images/raster.js";
 import { fit } from "./text.js";
+import { tr } from "../core/i18n.js";
 export function ImagePreview({
   image,
   width,
@@ -22,7 +23,7 @@ export function ImagePreview({
         : [],
     [selected, width, rows],
   );
-  const title = side === "before" ? "Anterior" : "Nueva";
+  const title = side === "before" ? tr("Anterior", "Before") : tr("Nueva", "After");
   return (
     <Box flexDirection="column">
       <Text bold color="cyan">
@@ -32,7 +33,7 @@ export function ImagePreview({
         )}
       </Text>
       <Text dimColor>
-        {fit("v: alternar anterior/nueva · vista previa", width)}
+        {fit(tr("v: alternar anterior/nueva · vista previa", "v: switch before/after · preview"), width)}
       </Text>
       {selected ? (
         pixels.map((spans, y) => (

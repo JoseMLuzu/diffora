@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 import { mkdir, readFile, writeFile, rename } from "node:fs/promises";
 import { homedir } from "node:os";
 import { join, dirname } from "node:path";
+import { tr } from "../core/i18n.js";
 
 export async function installSkills(home = homedir()): Promise<string[]> {
   const targets = (await Promise.all(["diffora", "terminal-review"].map(async (name) => {
@@ -20,12 +21,12 @@ export async function installSkills(home = homedir()): Promise<string[]> {
     await mkdir(dirname(target), { recursive: true });
     try {
       await writeFile(target, template, { flag: "wx" });
-      results.push(`Instalada: ${target}`);
+      results.push(tr(`Instalada: ${target}`, `Installed: ${target}`));
     } catch (error) {
       if ((error as NodeJS.ErrnoException).code !== "EEXIST") throw error;
       const existing = await readFile(target, "utf8");
       const hash = createHash("sha256").update(existing).digest("hex");
-      if (existing === template) results.push(`Ya instalada: ${target}`);
+      if (existing === template) results.push(tr(`Ya instalada: ${target}`, `Already installed: ${target}`));
       else if (previousTemplates.has(hash)) {
         const backup = `${target}.backup-${hash.slice(0, 12)}`;
         try {
@@ -37,10 +38,10 @@ export async function installSkills(home = homedir()): Promise<string[]> {
         const temporary = `${target}.tmp-${process.pid}`;
         await writeFile(temporary, template, { flag: "wx" });
         await rename(temporary, target);
-        results.push(`Actualizada: ${target} (copia anterior: ${backup})`);
+        results.push(tr(`Actualizada: ${target} (copia anterior: ${backup})`, `Updated: ${target} (previous copy: ${backup})`));
       } else
         results.push(
-          `Conservada sin sobrescribir: ${target} (contenido personalizado)`,
+          tr(`Conservada sin sobrescribir: ${target} (contenido personalizado)`, `Kept without overwriting: ${target} (customized content)`),
         );
     }
   }

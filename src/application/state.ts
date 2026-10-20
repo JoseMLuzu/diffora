@@ -7,12 +7,13 @@ import type {
 } from "../core/models.js";
 import { splitDiff } from "../core/splitDiff.js";
 import { identityKey, type Progress } from "../core/progress.js";
+import { tr } from "../core/i18n.js";
 import { reduceWorkflow, applyPending, applyFingerprint, retainVisible, canReview, type WorkflowAction, type Fingerprints } from "./reviewWorkflow.js";
 export const categories: Category[] = ["unstaged", "staged", "untracked"];
 export const labels: Record<Category, string> = {
-  unstaged: "Sin preparar",
-  staged: "Preparados",
-  untracked: "Sin seguimiento",
+  unstaged: tr("Sin preparar", "Unstaged"),
+  staged: tr("Preparados", "Staged"),
+  untracked: tr("Sin seguimiento", "Untracked"),
 };
 export type ReviewStatus = "unreviewed" | "needs-review" | "reviewed";
 export interface State extends Progress {
@@ -338,7 +339,7 @@ export function reducer(state: State, action: Action): State {
           ? action.files.findIndex((file) => reviewKey(state, file) === state.requestedFileKey)
           : visibleFiles({ ...state, files: action.files })[0]?.index ?? -1,
         notice: state.requestedFileKey && !action.files.some((file) => reviewKey(state, file) === state.requestedFileKey)
-          ? "La tarea corresponde a un cambio que ya no está disponible." : state.notice,
+          ? tr("La tarea corresponde a un cambio que ya no está disponible.", "This task refers to a change that is no longer available.") : state.notice,
         requestedFileKey: "",
         diff: null,
         scroll: 0,

@@ -1,5 +1,6 @@
 import sharp from "sharp";
 import type { ImagePreviewData } from "../core/models.js";
+import { tr } from "../core/i18n.js";
 export const MAX_IMAGE_BYTES = 10 * 1024 * 1024;
 export const MAX_IMAGE_PIXELS = 16_000_000;
 export function isImagePath(path: string): boolean {
@@ -11,7 +12,7 @@ export async function decodeImage(
 ): Promise<ImagePreviewData> {
   signal?.throwIfAborted();
   if (data.length > MAX_IMAGE_BYTES)
-    throw new Error("La imagen supera el límite de 10 MiB.");
+    throw new Error(tr("La imagen supera el límite de 10 MiB.", "The image exceeds the 10 MiB limit."));
   const png = data
     .subarray(0, 8)
     .equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]));
@@ -28,7 +29,7 @@ export async function decodeImage(
     /avif|avis/.test(data.subarray(8, 128).toString("ascii"));
   if (!png && !jpeg && !gif && !webp && !tiff && !avif)
     throw new Error(
-      "El contenido no es una imagen compatible (PNG, JPEG, WebP, GIF, TIFF o AVIF).",
+      tr("El contenido no es una imagen compatible (PNG, JPEG, WebP, GIF, TIFF o AVIF).", "The content is not a supported image (PNG, JPEG, WebP, GIF, TIFF, or AVIF)."),
     );
   const options = {
     limitInputPixels: MAX_IMAGE_PIXELS,
@@ -37,15 +38,15 @@ export async function decodeImage(
   };
   const metadata = await sharp(data, options).metadata();
   if (!metadata.width || !metadata.height)
-    throw new Error("No se pudieron leer las dimensiones de la imagen.");
+    throw new Error(tr("No se pudieron leer las dimensiones de la imagen.", "Could not read the image dimensions."));
   if (
     !["png", "jpeg", "webp", "gif", "tiff", "heif"].includes(
       metadata.format ?? "",
     )
   )
-    throw new Error("Formato de imagen no compatible.");
+    throw new Error(tr("Formato de imagen no compatible.", "Unsupported image format."));
   if (metadata.width * metadata.height > MAX_IMAGE_PIXELS)
-    throw new Error("La imagen supera el límite de 16 megapíxeles.");
+    throw new Error(tr("La imagen supera el límite de 16 megapíxeles.", "The image exceeds the 16-megapixel limit."));
   signal?.throwIfAborted();
   const pipeline = sharp(data, options)
     .rotate()

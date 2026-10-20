@@ -11,6 +11,7 @@ import type {
 } from "../core/models.js";
 import { decodeImage, isImagePath, MAX_IMAGE_BYTES } from "../images/decode.js";
 import { addedContent, parseDiff, safeText } from "../core/diff.js";
+import { tr } from "../core/i18n.js";
 import {
   GitError,
   MAX_DIFF_BYTES,
@@ -32,10 +33,10 @@ export function parseNames(text: string): ChangedFile[] {
     const status = tokens[i++];
     if (!status) continue;
     const first = tokens[i++];
-    if (first === undefined) throw new Error("Lista de archivos incompleta.");
+    if (first === undefined) throw new Error(tr("Lista de archivos incompleta.", "Incomplete file list."));
     if (/^[RC]/.test(status)) {
       const path = tokens[i++];
-      if (path === undefined) throw new Error("Renombre incompleto.");
+      if (path === undefined) throw new Error(tr("Renombre incompleto.", "Incomplete rename."));
       files.push({ status, path, oldPath: first });
     } else files.push({ status, path: first });
   }
@@ -44,10 +45,11 @@ export function parseNames(text: string): ChangedFile[] {
 export class Repository {
   constructor(public readonly root: string) {}
   static async discover(path: string): Promise<Repository> {
-    const result = await runGit(resolve(path), [
-      "rev-parse",
-      "--show-toplevel",
-    ]);
+    const result = await runGit(resolve(path), ["rev-parse", "--show-toplevel"]).catch((error: unknown) => {
+      if (error instanceof GitError && /not a git repository/i.test(error.message))
+        throw new GitError(tr("La carpeta no es un repositorio Git.", "The directory is not a Git repository."), error.code);
+      throw error;
+    });
     return new Repository(await realpath(result.text.replace(/\r?\n$/, "")));
   }
   async hasHead(signal?: AbortSignal): Promise<boolean> {
@@ -69,11 +71,11 @@ export class Repository {
     return fingerprint(this.root, source, file, signal);
   }
   async commit(hash: string, signal?: AbortSignal): Promise<Commit> {
-    if (!/^[a-f0-9]{3,64}$/.test(hash)) throw new Error("Hash de commit inválido.");
+    if (!/^[a-f0-9]{3,64}$/.test(hash)) throw new Error(tr("Hash de commit inválido.", "Invalid commit hash."));
     const { text } = await runGit(this.root, ["show", "--no-patch", "--no-show-signature",
       "--format=%H%x00%h%x00%s%x00%cs%x00%P", hash, "--"], MAX_QUERY_BYTES, false, signal);
     const fields = text.trimEnd().split("\0");
-    if (fields.length !== 5) throw new Error("Commit no disponible.");
+    if (fields.length !== 5) throw new Error(tr("Commit no disponible.", "Commit unavailable."));
     const commits = await this.withPushStatus([{ hash: fields[0]!, shortHash: fields[1]!, title: fields[2]!, date: fields[3]!, parents: fields[4]!.split(" ").filter(Boolean) }], signal);
     return commits[0]!;
   }
@@ -204,8 +206,8 @@ export class Repository {
     signal?: AbortSignal,
   ): Promise<Diff> {
     const images: ImageDiff = {
-      beforeNotice: "No existe versión anterior (archivo añadido).",
-      afterNotice: "No existe versión nueva (archivo eliminado).",
+      beforeNotice: tr("No existe versión anterior (archivo añadido).", "No previous version (added file)."),
+      afterNotice: tr("No existe versión nueva (archivo eliminado).", "No new version (deleted file)."),
     };
     const oldPath = file.oldPath ?? file.path;
     for (const side of ["before", "after"] as const) {
@@ -251,21 +253,21 @@ export class Repository {
       } catch (error) {
         signal?.throwIfAborted();
         images[side === "before" ? "beforeNotice" : "afterNotice"] = safeText(
-          `No se puede previsualizar: ${error instanceof Error ? error.message : String(error)}`,
+          tr(`No se puede previsualizar: ${error instanceof Error ? error.message : String(error)}`, `Cannot preview: ${error instanceof Error ? error.message : String(error)}`),
         );
       }
     }
     const lines = [
       {
         kind: "meta" as const,
-        text: "Imagen · abre el visor interactivo para verla; v alterna anterior/nueva.",
+        text: tr("Imagen · abre el visor interactivo para verla; v alterna anterior/nueva.", "Image · open the interactive viewer to see it; v switches before/after."),
       },
     ];
     for (const side of ["before", "after"] as const) {
       const img = images[side];
       lines.push({
         kind: "meta",
-        text: `${side === "before" ? "Anterior" : "Nueva"}: ${img ? `${img.format.toUpperCase()} ${img.width}×${img.height} · ${img.bytes} bytes` : images[side === "before" ? "beforeNotice" : "afterNotice"]}`,
+        text: `${side === "before" ? tr("Anterior", "Before") : tr("Nueva", "After")}: ${img ? `${img.format.toUpperCase()} ${img.width}×${img.height} · ${img.bytes} bytes` : images[side === "before" ? "beforeNotice" : "afterNotice"]}`,
       });
     }
     return { lines, binary: true, truncated: false, image: images };
@@ -275,18 +277,18 @@ export class Repository {
     const full = resolve(this.root, path);
     const rel = relative(this.root, full);
     if (rel === ".." || rel.startsWith(`..${sep}`) || isAbsolute(rel))
-      throw new Error("Ruta fuera del repositorio.");
+      throw new Error(tr("Ruta fuera del repositorio.", "Path outside the repository."));
     const stat = await lstat(full);
     if (!stat.isFile() || stat.isSymbolicLink())
-      throw new Error("La vista previa requiere un archivo regular.");
+      throw new Error(tr("La vista previa requiere un archivo regular.", "Preview requires a regular file."));
     if (stat.size > MAX_IMAGE_BYTES)
-      throw new Error("La imagen supera el límite de 10 MiB.");
+      throw new Error(tr("La imagen supera el límite de 10 MiB.", "The image exceeds the 10 MiB limit."));
     const handle = await open(full, "r");
     try {
       const buffer = Buffer.alloc(Math.min(stat.size, MAX_IMAGE_BYTES) + 1);
       const { bytesRead } = await handle.read(buffer, 0, buffer.length, 0);
       if (bytesRead > MAX_IMAGE_BYTES)
-        throw new Error("La imagen supera el límite de 10 MiB.");
+        throw new Error(tr("La imagen supera el límite de 10 MiB.", "The image exceeds the 10 MiB limit."));
       signal?.throwIfAborted();
       return buffer.subarray(0, bytesRead);
     } finally {
@@ -298,13 +300,13 @@ export class Repository {
     const full = resolve(this.root, path);
     const rel = relative(this.root, full);
     if (rel === ".." || rel.startsWith(`..${sep}`) || isAbsolute(rel))
-      throw new Error("Ruta fuera del repositorio.");
+      throw new Error(tr("Ruta fuera del repositorio.", "Path outside the repository."));
     const stat = await lstat(full);
     if (stat.isSymbolicLink())
       return addedContent(Buffer.from(await readlink(full)), false);
     if (!stat.isFile())
       return {
-        lines: [{ kind: "meta", text: "No es un archivo regular." }],
+        lines: [{ kind: "meta", text: tr("No es un archivo regular.", "Not a regular file.") }],
         binary: false,
         truncated: false,
       };

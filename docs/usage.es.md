@@ -13,6 +13,8 @@ diffora
 
 `npm i diffora` (sin `--global`) lo instala solo en la carpeta actual. En ese caso, entra al repositorio que quieres revisar y ejecuta `npx diffora`, o pasa su ruta con `npx diffora --repo /ruta/al/repositorio`. Para disponer de `diffora` directamente desde cualquier carpeta, usa la instalación global. Comprueba la versión con `diffora --version` o `npx diffora --version`.
 
+Diffora detecta el idioma preferido del dispositivo al abrirse: usa español para configuraciones en español e inglés para las demás. Cambian el visor, la ayuda, el modo texto, los avisos y los informes exportados; el contenido de los archivos, las rutas y los títulos de commits conservan su idioma original. Para elegirlo manualmente en una ejecución, usa `DIFFORA_LANG=es diffora` o `DIFFORA_LANG=en diffora`.
+
 Si la instalación global falla con `EEXIST` en `.../bin/terminal-review`, hay un enlace global antiguo que ocupa el alias compatible de Diffora. Retira ese enlace e instala el paquete con la misma versión de Node que usas habitualmente:
 
 ```sh
@@ -85,6 +87,8 @@ Las categorías pendientes son:
 - **Sin seguimiento:** archivos nuevos no ignorados, representados como contenido añadido.
 
 Se muestran estados Git (`A`, `M`, `D`, `R…`, `?`) y origen/destino de renombres. Las imágenes compatibles muestran una vista previa a color; los demás binarios presentan un aviso. Los cambios de permisos y renombres sin cambios de contenido muestran los metadatos del patch.
+
+La barra inferior muestra solo los controles útiles para el panel activo. Pulsa `?` para ver la ayuda completa agrupada por tarea.
 
 | Tecla           | Acción                                                 |
 | --------------- | ------------------------------------------------------ |
