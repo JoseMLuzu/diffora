@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
-import { mkdtemp, rm } from "node:fs/promises";
+import { mkdtemp, readFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { languageFromLocale } from "../src/core/i18n.js";
@@ -26,6 +26,8 @@ test("ayuda y modo texto siguen el idioma seleccionado", async (t) => {
   assert.match(run("es-EC", ["--help"]), /Navegar:.*Cambiar vista:/s);
   assert.match(run("en-US", ["--help"]), /Navigate:.*Switch view:/s);
   assert.match(run("fr-FR", ["--help"]), /Navigate:/);
+  const { version } = JSON.parse(await readFile(join(process.cwd(), "package.json"), "utf8")) as { version: string };
+  assert.equal(run("en-US", ["--version"]).trim(), version);
   assert.match(run("es-EC", ["--text", "--repo", root]), /Sin preparar.*Historial vacío/s);
   assert.match(run("en-US", ["--text", "--repo", root]), /Unstaged.*No commits/s);
 

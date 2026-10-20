@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import { parseArgs } from "node:util";
+import { createRequire } from "node:module";
 import { Repository } from "./git/repository.js";
 import { textReview } from "./application/textReview.js";
 import { openTerminal } from "./application/openTerminal.js";
@@ -52,7 +53,8 @@ async function main() {
     return;
   }
   if (values.version) {
-    console.log("0.1.0");
+    const { version } = createRequire(import.meta.url)("../package.json") as { version: string };
+    console.log(version);
     return;
   }
   if (values["install-skills"]) {
